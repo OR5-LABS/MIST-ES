@@ -1,4 +1,4 @@
-// tb_regfile_ecc.sv — unit test for kavacha_regfile_ecc (SECDED).
+// tb_regfile_ecc.sv — unit test for mist_es_regfile_ecc (SECDED).
 //   * write a known value, inject a SINGLE-bit storage flip -> read is CORRECTED
 //     and ecc_cerr pulses.
 //   * inject a DOUBLE-bit flip -> ecc_uerr (uncorrectable) is detected.
@@ -9,7 +9,7 @@ module tb_regfile_ecc;
   logic [31:0] rd1, rd2, wd;
   logic we, cerr, uerr;
 
-  kavacha_regfile_ecc #(.WRITE_FIRST(0)) dut (
+  mist_es_regfile_ecc #(.WRITE_FIRST(0)) dut (
     .clk(clk), .ra1(ra1), .ra2(ra2), .rd1(rd1), .rd2(rd2),
     .we(we), .wa(wa), .wd(wd), .ecc_cerr(cerr), .ecc_uerr(uerr));
 

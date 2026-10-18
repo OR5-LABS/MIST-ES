@@ -1,5 +1,0 @@
-// Verilator flags file for Kavacha benchmark model
-// Passed via: verilator -f bench/verilator/kavacha.vlt ...
-// This avoids GNU Make misinterpreting '+' at the start of recipe lines.
-+incdir+rtl/common
-+incdir+rtl

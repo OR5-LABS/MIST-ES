@@ -1,0 +1,5 @@
+// Verilator flags file for MIST-ES benchmark model
+// Passed via: verilator -f bench/verilator/mist_es.vlt ...
+// This avoids GNU Make misinterpreting '+' at the start of recipe lines.
++incdir+rtl/common
++incdir+rtl

@@ -1,14 +1,14 @@
 // ============================================================================
-// kavacha_soc.sv — Minimal SoC wrapper for the multi-cycle Kavacha core.
+// mist_es_soc.sv — Minimal SoC wrapper for the multi-cycle MIST-ES core.
 // Address map matches the family: IMEM @0, tohost @0x2000_0000, DRAM @0x8000_0000.
 //
-// Includes the RISC-V Debug Module + JTAG DTM (kavacha_debug). Drive the JTAG
+// Includes the RISC-V Debug Module + JTAG DTM (mist_es_debug). Drive the JTAG
 // pins from an external adapter (OpenOCD); tie tck/tms/tdi low if unused.
 // ============================================================================
-`include "kavacha_pkg.sv"
+`include "mist_es_pkg.sv"
 
-module kavacha_soc
-  import kavacha_pkg::*;
+module mist_es_soc
+  import mist_es_pkg::*;
 #(
   parameter bit [31:0] IMEM_WORDS = 8192,
   parameter bit [31:0] DRAM_WORDS = 8192,
@@ -16,8 +16,8 @@ module kavacha_soc
 
   parameter logic [XLEN-1:0] DRAM_BASE   = 32'h8000_0000,
   parameter logic [XLEN-1:0] TOHOST_ADDR = 32'h2000_0000,
-`ifdef KAVACHA_SECURE
-  parameter bit SECURE = 1'b1     // -DKAVACHA_SECURE -> User mode + PMP
+`ifdef MIST_ES_SECURE
+  parameter bit SECURE = 1'b1     // -DMIST_ES_SECURE -> User mode + PMP
 `else
   parameter bit SECURE = 1'b0     // default: minimal machine-mode-only footprint
 `endif
@@ -65,7 +65,7 @@ module kavacha_soc
 
   wire core_rst = rst | ndmreset;     // ndmreset resets the hart, not the DM
 
-  kavacha_core #(.SECURE(SECURE)) u_core (
+  mist_es_core #(.SECURE(SECURE)) u_core (
     .clk(clk), .rst(core_rst),
     .imem_addr(imem_addr), .imem_rdata(imem_rdata),
     .dmem_addr(dmem_addr), .dmem_re(dmem_re), .dmem_we(dmem_we),
@@ -81,7 +81,7 @@ module kavacha_soc
     .dbg_ar_rdata(dbg_ar_rdata), .dbg_ar_done(dbg_ar_done)
   );
 
-  kavacha_debug u_dbg (
+  mist_es_debug u_dbg (
     .clk(clk), .rst(rst),
     .tck(tck), .tms(tms), .tdi(tdi), .tdo(tdo),
     .dbg_haltreq(dbg_haltreq), .dbg_resumereq(dbg_resumereq),

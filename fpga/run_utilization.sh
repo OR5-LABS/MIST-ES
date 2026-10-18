@@ -2,7 +2,7 @@
 # =============================================================================
 # run_utilization.sh — Master FPGA Resource Utilization & Timing Benchmark Runner
 #
-# Runs Vivado 2023.2 synthesis for Kavacha Core and SoC in both Default
+# Runs Vivado 2023.2 synthesis for MIST-ES Core and SoC in both Default
 # (Machine Mode) and SECURE (M+U, PMP/ePMP, ECC) configurations.
 # =============================================================================
 set -e
@@ -33,7 +33,7 @@ BUILD_BASE="$SCRIPT_DIR/arty_a7/build_util"
 mkdir -p "$BUILD_BASE"
 
 echo "=========================================================================="
-echo "  KAVACHA RISC-V CORE & SOC RESOURCE UTILIZATION SUITE (Xilinx Artix-7)"
+echo "  MIST-ES RISC-V CORE & SOC RESOURCE UTILIZATION SUITE (Xilinx Artix-7)"
 echo "=========================================================================="
 
 run_synth() {

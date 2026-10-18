@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ============================================================================
-# build.sh — build & run Kavacha under Icarus Verilog.
+# build.sh — build & run MIST-ES under Icarus Verilog.
 #
 #   ./build.sh [sim|cosim|rvfi|debug|pmp|epmp|upriv|mml|ecc|axil|fpga|bench|clean]
 #
@@ -24,14 +24,14 @@ IVL="${IVERILOG:-iverilog}"
 VVP="${VVP:-vvp}"
 ACTION="${1:-sim}"
 
-R=rtl            # kavacha core + SoC
+R=rtl            # mist_es core + SoC
 C=rtl/common     # shared datapath leaf cells
 
 # Every simulation build needs the same leaf-cell set.
-CELLS="$C/kavacha_pkg.sv $C/kavacha_alu.sv $C/kavacha_regfile.sv \
-       $C/kavacha_muldiv.sv $C/kavacha_csr.sv $C/kavacha_rvc.sv \
-       $C/kavacha_immgen.sv $C/kavacha_branch.sv $C/kavacha_decode.sv $C/kavacha_pmp.sv"
-CORE="$R/kavacha_core.sv $R/kavacha_debug.sv $R/kavacha_soc.sv"
+CELLS="$C/mist_es_pkg.sv $C/mist_es_alu.sv $C/mist_es_regfile.sv \
+       $C/mist_es_muldiv.sv $C/mist_es_csr.sv $C/mist_es_rvc.sv \
+       $C/mist_es_immgen.sv $C/mist_es_branch.sv $C/mist_es_decode.sv $C/mist_es_pmp.sv"
+CORE="$R/mist_es_core.sv $R/mist_es_debug.sv $R/mist_es_soc.sv"
 
 if [[ "$ACTION" == "clean" ]]; then
   rm -rf sim programs/build/*.hex *.vcd
@@ -56,7 +56,7 @@ check_verdict() {  # $1 = test name, $2 = log file, $3 = PASS regex
 if [[ "$ACTION" == "ecc" ]]; then
   echo "Building register-file SECDED ECC unit test..."
   "$IVL" -g2012 -I "$C" -o sim/tb_regfile_ecc \
-    "$C/kavacha_pkg.sv" "$C/kavacha_regfile_ecc.sv" tb/tb_regfile_ecc.sv
+    "$C/mist_es_pkg.sv" "$C/mist_es_regfile_ecc.sv" tb/tb_regfile_ecc.sv
   "$VVP" sim/tb_regfile_ecc | tee sim/ecc.log
   check_verdict ecc sim/ecc.log '^ECC: PASS'
   exit 0
@@ -106,11 +106,11 @@ if [[ "$ACTION" == "pmp" || "$ACTION" == "epmp" || "$ACTION" == "upriv" || "$ACT
   else
     echo "No RISC-V toolchain found; using prebuilt programs/build/${HEXNAME}.hex."
   fi
-  echo "Building Kavacha SECURE sim (U-mode + PMP + ePMP + regfile ECC)..."
-  "$IVL" -g2012 -DKAVACHA_SECURE -I "$C" -I "$R" -o sim/tb_kavacha \
-    $CELLS "$C/kavacha_regfile_ecc.sv" $CORE tb/tb_kavacha.sv
-  echo "Running $ACTION test on Kavacha..."
-  "$VVP" sim/tb_kavacha +IMEM="programs/build/${HEXNAME}.hex" | tee "sim/${HEXNAME}.log"
+  echo "Building MIST-ES SECURE sim (U-mode + PMP + ePMP + regfile ECC)..."
+  "$IVL" -g2012 -DMIST_ES_SECURE -I "$C" -I "$R" -o sim/tb_mist_es \
+    $CELLS "$C/mist_es_regfile_ecc.sv" $CORE tb/tb_mist_es.sv
+  echo "Running $ACTION test on MIST-ES..."
+  "$VVP" sim/tb_mist_es +IMEM="programs/build/${HEXNAME}.hex" | tee "sim/${HEXNAME}.log"
   # The testbench ends with $finish either way; fail the script unless it passed.
   check_verdict "$ACTION" "sim/${HEXNAME}.log" '^\[TB\] PASS'
   exit 0
@@ -119,39 +119,39 @@ fi
 # ---- default: compile + smoke ---------------------------------------------
 python3 programs/build_smoke.py
 echo "Compiling..."
-"$IVL" -g2012 -I "$C" -I "$R" -o sim/tb_kavacha $CELLS $CORE tb/tb_kavacha.sv
+"$IVL" -g2012 -I "$C" -I "$R" -o sim/tb_mist_es $CELLS $CORE tb/tb_mist_es.sv
 echo "Running smoke..."
-"$VVP" sim/tb_kavacha +IMEM=programs/build/smoke.hex | tee sim/smoke.log
+"$VVP" sim/tb_mist_es +IMEM=programs/build/smoke.hex | tee sim/smoke.log
 check_verdict smoke sim/smoke.log '^\[TB\] PASS'
 
 # ---- golden co-simulation --------------------------------------------------
 if [[ "$ACTION" == "cosim" ]]; then
   echo "Co-simulating against the golden RV32IM ISA model..."
   VVP="$VVP" python tools/cosim.py \
-      --hex programs/build/smoke.hex --sim sim/tb_kavacha
+      --hex programs/build/smoke.hex --sim sim/tb_mist_es
 fi
 
 # ---- RVFI (riscv-formal interface) self-check -----------------------------
 if [[ "$ACTION" == "rvfi" ]]; then
   echo "Building RVFI self-check..."
-  "$IVL" -g2012 -DRISCV_FORMAL -I "$C" -I "$R" -o sim/tb_kavacha_rvfi \
-    $CELLS $CORE tb/tb_kavacha_rvfi.sv
-  "$VVP" sim/tb_kavacha_rvfi +IMEM=programs/build/smoke.hex | tee sim/rvfi.log
+  "$IVL" -g2012 -DRISCV_FORMAL -I "$C" -I "$R" -o sim/tb_mist_es_rvfi \
+    $CELLS $CORE tb/tb_mist_es_rvfi.sv
+  "$VVP" sim/tb_mist_es_rvfi +IMEM=programs/build/smoke.hex | tee sim/rvfi.log
   check_verdict rvfi sim/rvfi.log '^RVFI: PASS'
 fi
 
 # ---- JTAG / Debug-Module self-check ---------------------------------------
 if [[ "$ACTION" == "debug" ]]; then
   echo "Building JTAG / Debug-Module self-check..."
-  "$IVL" -g2012 -I "$C" -I "$R" -o sim/tb_kavacha_debug \
-    $CELLS $CORE tb/tb_kavacha_debug.sv
-  "$VVP" sim/tb_kavacha_debug +IMEM=programs/build/smoke.hex | tee sim/debug.log
+  "$IVL" -g2012 -I "$C" -I "$R" -o sim/tb_mist_es_debug \
+    $CELLS $CORE tb/tb_mist_es_debug.sv
+  "$VVP" sim/tb_mist_es_debug +IMEM=programs/build/smoke.hex | tee sim/debug.log
   check_verdict debug sim/debug.log '^DEBUG: PASS'
 fi
 
 # ---- Verilator benchmark suite (CoreMark) -------------------
 if [[ "$ACTION" == "bench" ]]; then
-  echo "Running Kavacha benchmark suite (CoreMark)..."
+  echo "Running MIST-ES benchmark suite (CoreMark)..."
   echo "  Verilator model + CoreMark will be compiled and simulated."
   echo "  Results will appear in bench/results/report.md"
   echo ""
@@ -168,9 +168,9 @@ fi
 if [[ "$ACTION" == "axil" ]]; then
   echo "Building AXI4-Lite bus integration self-check..."
   python3 programs/build_smoke.py
-  "$IVL" -g2012 -I "$C" -I "$R" -o sim/tb_kavacha_axil \
-    $CELLS "$R/kavacha_core.sv" "$R/kavacha_debug.sv" "$R/kavacha_axil.sv" tb/tb_kavacha_axil.sv
-  "$VVP" sim/tb_kavacha_axil +IMEM=programs/build/smoke.hex | tee sim/axil.log
+  "$IVL" -g2012 -I "$C" -I "$R" -o sim/tb_mist_es_axil \
+    $CELLS "$R/mist_es_core.sv" "$R/mist_es_debug.sv" "$R/mist_es_axil.sv" tb/tb_mist_es_axil.sv
+  "$VVP" sim/tb_mist_es_axil +IMEM=programs/build/smoke.hex | tee sim/axil.log
   check_verdict axil sim/axil.log '^\[TB\] PASS'
   exit 0
 fi
@@ -179,9 +179,9 @@ fi
 if [[ "$ACTION" == "fpga" ]]; then
   echo "Building FPGA SoC sim..."
   [[ -f sw/firmware.mem ]] || (cd sw && bash build_fpga_hello.sh)
-  "$IVL" -g2012 -DSIMULATION -I "$C" -I "$R" -o sim/tb_kavacha_fpga \
-    $CELLS "$R/kavacha_core.sv" "$R/kavacha_debug.sv" \
-    fpga/common/kavacha_uart.sv fpga/kavacha_fpga.sv fpga/tb_kavacha_fpga.sv
-  "$VVP" sim/tb_kavacha_fpga | tee sim/fpga.log
+  "$IVL" -g2012 -DSIMULATION -I "$C" -I "$R" -o sim/tb_mist_es_fpga \
+    $CELLS "$R/mist_es_core.sv" "$R/mist_es_debug.sv" \
+    fpga/common/mist_es_uart.sv fpga/mist_es_fpga.sv fpga/tb_mist_es_fpga.sv
+  "$VVP" sim/tb_mist_es_fpga | tee sim/fpga.log
   check_verdict fpga sim/fpga.log '^FPGA: PASS'
 fi

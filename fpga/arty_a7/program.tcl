@@ -19,7 +19,7 @@ if {[llength $devices] == 0} {
 set device [lindex $devices 0]
 current_hw_device $device
 puts "Programming device: $device"
-set_property PROGRAM.FILE {build/kavacha_arty_a7.bit} $device
+set_property PROGRAM.FILE {build/mist_es_arty_a7.bit} $device
 if {[catch {program_hw_devices $device} err]} {
     puts "Error programming device: $err"
     close_hw_target

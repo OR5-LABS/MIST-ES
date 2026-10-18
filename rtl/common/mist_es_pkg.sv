@@ -1,14 +1,14 @@
 // ============================================================================
-// kavacha_pkg.sv — Shared types & constants for the Kavacha RV32IMC core.
+// mist_es_pkg.sv — Shared types & constants for the MIST-ES RV32IMC core.
 //
 // Common datapath definitions used by the core and its leaf cells: XLEN,
 // opcode/funct encodings, the decoded control bundle, and the ALU / branch
 // operation selectors.
 // ============================================================================
-`ifndef KAVACHA_PKG_SV
-`define KAVACHA_PKG_SV
+`ifndef MIST_ES_PKG_SV
+`define MIST_ES_PKG_SV
 
-package kavacha_pkg;
+package mist_es_pkg;
 
   // ---- Word geometry -------------------------------------------------------
   localparam bit [31:0] XLEN = 32;
@@ -74,11 +74,11 @@ package kavacha_pkg;
   localparam logic [11:0] CSR_MARCHID  = 12'hF12;
   localparam logic [11:0] CSR_MHARTID  = 12'hF14;
   // Read-only user-mode aliases (0xC00/0xC80) — same as mcycle/mcycleh.
-  // Allows firmware compiled once to run on both Kavacha
+  // Allows firmware compiled once to run on both MIST-ES
   localparam logic [11:0] CSR_CYCLE    = 12'hC00;
   localparam logic [11:0] CSR_CYCLEH   = 12'hC80;
   localparam logic [11:0] CSR_INSTRET  = 12'hC02;
 
-endpackage : kavacha_pkg
+endpackage : mist_es_pkg
 
 `endif

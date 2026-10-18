@@ -3,11 +3,13 @@ set -e
 
 # Resolve paths
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" &> /dev/null && pwd)"
-KAVACHA_DIR="$(dirname "$SCRIPT_DIR")"
-VERIF_TOOLS_DIR="$KAVACHA_DIR/verification/tools"
+MIST_ES_DIR="$(dirname "$SCRIPT_DIR")"
 
-# Detect RISC-V GCC from system PATH
-if command -v riscv-none-elf-gcc &>/dev/null; then
+# Detect RISC-V GCC
+TC="${RISCV_TC:-}"
+if [[ -n "$TC" && -x "$TC/riscv-none-elf-gcc" ]]; then
+    RISCV_GCC="$TC/riscv-none-elf-gcc"
+elif command -v riscv-none-elf-gcc &>/dev/null; then
     RISCV_GCC="riscv-none-elf-gcc"
 elif command -v riscv64-unknown-elf-gcc &>/dev/null; then
     RISCV_GCC="riscv64-unknown-elf-gcc"
@@ -16,13 +18,13 @@ elif command -v riscv32-unknown-elf-gcc &>/dev/null; then
 elif command -v riscv64-elf-gcc &>/dev/null; then
     RISCV_GCC="riscv64-elf-gcc"
 else
-    echo "ERROR: No RISC-V GCC found. Ensure riscv-none-elf-gcc is in your PATH (e.g. add it to ~/.bashrc)."
+    echo "ERROR: No RISC-V GCC found. Set RISCV_TC or ensure riscv-none-elf-gcc / riscv64-unknown-elf-gcc is in your PATH."
     exit 1
 fi
 echo "[BUILD] Toolchain: $RISCV_GCC"
 
 # Move to bench directory
-cd "$KAVACHA_DIR/bench"
+cd "$MIST_ES_DIR/bench"
 
 echo "========================================="
 echo " Building and Running CoreMark Simulation"
@@ -36,7 +38,7 @@ rm -f build/coremark.hex build/coremark.elf
 make coremark ITERATIONS=10 RISCV_GCC="$RISCV_GCC"
 
 # Run simulation
-make run-kavacha-coremark TIMEOUT_CYCLES=50000000
+make run-mist-es-coremark TIMEOUT_CYCLES=50000000
 
 echo ""
 echo "========================================="
@@ -45,7 +47,7 @@ echo "========================================="
 python3 -c '
 import re
 
-log_path = "results/kavacha/coremark.log"
+log_path = "results/mist_es/coremark.log"
 try:
     text = open(log_path).read()
     
@@ -75,7 +77,7 @@ except Exception as e:
 '
 
 # Fail unless the simulation passed and CoreMark's CRC self-checks found no error.
-LOG=results/kavacha/coremark.log
+LOG=results/mist_es/coremark.log
 if grep -aq 'ERROR! \(list\|matrix\|state\) crc' "$LOG" ||
    ! grep -aqE '^\[BENCH\] coremark .* PASS$' "$LOG"; then
   echo "CoreMark: FAIL (see bench/$LOG)"; exit 1

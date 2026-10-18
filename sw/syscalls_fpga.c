@@ -6,7 +6,7 @@
  *   instead of the tohost side-channel.  This makes printf() output appear on
  *   the host's serial terminal at 115200 baud.
  *
- * UART register map (kavacha_uart.sv):
+ * UART register map (mist_es_uart.sv):
  *   0x10000000 R : status  — bit0 = tx_busy
  *   0x10000000 W : TX data byte
  * ============================================================================ */

@@ -1,5 +1,5 @@
 // ============================================================================
-// kavacha_pmp.sv — RISC-V Physical Memory Protection (PMP) checker.
+// mist_es_pmp.sv — RISC-V Physical Memory Protection (PMP) checker.
 //
 // Combinational access check for one memory reference (fetch / load / store).
 // Implements the standard PMP matching modes per region — OFF / TOR / NA4 /
@@ -20,7 +20,7 @@
 // ============================================================================
 `default_nettype none
 
-module kavacha_pmp #(
+module mist_es_pmp #(
   parameter int NPMP = 8
 )(
   input  wire [8*NPMP-1:0]  cfg,       // {pmpNcfg, ..., pmp0cfg}

@@ -1,12 +1,12 @@
 // ============================================================================
-// kavacha_regfile.sv — 32x32 register file. x0 hard-wired to zero.
+// mist_es_regfile.sv — 32x32 register file. x0 hard-wired to zero.
 // Two async read ports, one sync write port. Write-first transparency is
 // handled by forwarding in the core, not here.
 // ============================================================================
-`include "kavacha_pkg.sv"
+`include "mist_es_pkg.sv"
 
-module kavacha_regfile
-  import kavacha_pkg::*;
+module mist_es_regfile
+  import mist_es_pkg::*;
 #(
   // 1 = WB->ID transparency (needed by the pipelined cores). Multi-cycle cores
   // must set this 0: their write data is combinational, so transparency would

@@ -1,5 +1,4 @@
-// ============================================================================
-// kavacha_arty_a7.sv — Digilent Arty A7-100T top for the Kavacha SoC.
+// mist_es_arty_a7.sv — Digilent Arty A7-100T top for the MIST-ES SoC.
 // Device: xc7a100tcsg324-1.
 //
 // Clock strategy:
@@ -18,12 +17,12 @@
 //   jtag_*        PMOD JA
 //
 // After bitstream is loaded:
-//   openFPGALoader -b arty_a7_100t kavacha_arty_a7.bit
+//   openFPGALoader -b arty_a7_100t mist_es_arty_a7.bit
 //   python3 sw/run_hil_bench.py --port /dev/ttyUSB1 --freq 50 --bench coremark --no-flash
 // ============================================================================
 `default_nettype none
 
-module kavacha_arty_a7 #(
+module mist_es_arty_a7 #(
   parameter bit SECURE = 1'b0
 )(
   input  wire       CLK100,
@@ -66,10 +65,10 @@ module kavacha_arty_a7 #(
   common_reset_sync #(.DEPTH(3), .ACTIVE_HIGH(1'b1)) u_rst (
       .clk(clk_50), .async_rst_in(~ck_rst | ~pll_locked), .sync_rst_out(sys_rst));
 
-  // ---- Kavacha SoC at 50 MHz ----------------------------------------------
+  // ---- MIST-ES SoC at 50 MHz ----------------------------------------------
   // CLK_HZ must match the actual clock so the UART baud divisor is correct.
   wire [7:0] soc_leds;
-  kavacha_fpga #(.CLK_HZ(50_000_000), .UART_BAUD(115_200),
+  mist_es_fpga #(.CLK_HZ(50_000_000), .UART_BAUD(115_200),
                  .MEM_WORDS(32768), .MEMFILE("firmware.mem"),
                  .SECURE(SECURE)) u_soc (
       .clk(clk_50), .rst(sys_rst),

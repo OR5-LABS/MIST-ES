@@ -1,10 +1,8 @@
 <div align="center">
 
-# Kavacha
+# MIST-ES
 
-<p align="center">
-  <img src="kavacha-banner.png" alt="Kavacha Logo" width="600"/>
-</p>
+
 
 <p align="center">
   <img src="https://img.shields.io/badge/ISA-RV32IMC-green" alt="ISA"/>
@@ -17,10 +15,10 @@
 
 ## About
 
-**Kavacha** (*"armour"* in Sanskrit) is a compact, area-optimized **RV32IMC** processor core.
+**MIST-ES** is a compact, area-optimized **RV32IMC** processor core.
 It executes one instruction at a time through a small multi-cycle finite state machine — no pipeline, no forwarding, and no hazard logic — which keeps the design tiny, deterministic, and straightforward to verify.
 
-Kavacha targets roles where silicon area, power, and security matter more than peak throughput:
+MIST-ES targets roles where silicon area, power, and security matter more than peak throughput:
 
 -  **Secure boot ROMs and management engines**
 -  **Deeply embedded control-plane state machines**
@@ -43,7 +41,6 @@ Kavacha targets roles where silicon area, power, and security matter more than p
 
 ---
 
-![Kavacha RV — RISC-V core by OR5 Labs](Kavacha_architecture_README.png)
 
 
 ## Features
@@ -81,8 +78,8 @@ Exceptions (`ECALL`, `EBREAK`, illegal instruction, and PMP access faults in the
 
 ## Configuration Options
 
-Kavacha ships in two build-time configurations, selected by the `SECURE` RTL parameter
-or compile-time define `-DKAVACHA_SECURE`:
+MIST-ES ships in two build-time configurations, selected by the `SECURE` RTL parameter
+or compile-time define `-DMIST_ES_SECURE`:
 
 | Property / Feature | **Default** | **SECURE** |
 |---|---|---|
@@ -112,14 +109,14 @@ or compile-time define `-DKAVACHA_SECURE`:
 > **Target:** Xilinx Artix-7 (Arty A7-100T, `xc7a100tcsg324-1`)
 > Post-synthesis & post-implementation results from Vivado 2023.2.
 
-### Standalone Processor Core (`kavacha_core`)
+### Standalone Processor Core (`mist_es_core`)
 
 | Configuration | LUTs | FFs | DSPs | BRAMs |
 |---------------|------|-----|------|-------|
 | **Default** (Machine mode only) | **2,491** | **749** | **4** | **0** |
 | **SECURE** (M+U, PMP/ePMP, ECC) | **4,362** | **1,400** | **4** | **0** |
 
-### Full Synthesized SoC (`kavacha_arty_a7`)
+### Full Synthesized SoC (`mist_es_arty_a7`)
 
 | Configuration | LUTs | FFs | DSPs | BRAMs (128 KB) |
 |---------------|------|-----|------|----------------|
@@ -130,10 +127,10 @@ or compile-time define `-DKAVACHA_SECURE`:
 
 | Sub-Module / Unit | Description | Default LUTs (FFs) | SECURE LUTs (FFs) |
 |-------------------|-------------|--------------------|-------------------|
-| `kavacha_regfile` | GPR File (32×32-bit, plain vs SECDED ECC) | 1,403 (0 FFs) | 1,596 (0 FFs) |
-| `kavacha_csr` | CSR File (Zicsr, Machine/User, 8-region PMP/ePMP) | 389 (320 FFs) | 2,054 (965 FFs) |
-| `kavacha_muldiv` | 32-bit Iterative Multiply & Divide Engine | 437 (237 FFs) | 458 (237 FFs) |
-| `kavacha_pmp` | Physical Memory Protection Checker | — | 21 (0 FFs) |
+| `mist_es_regfile` | GPR File (32×32-bit, plain vs SECDED ECC) | 1,403 (0 FFs) | 1,596 (0 FFs) |
+| `mist_es_csr` | CSR File (Zicsr, Machine/User, 8-region PMP/ePMP) | 389 (320 FFs) | 2,054 (965 FFs) |
+| `mist_es_muldiv` | 32-bit Iterative Multiply & Divide Engine | 437 (237 FFs) | 458 (237 FFs) |
+| `mist_es_pmp` | Physical Memory Protection Checker | — | 21 (0 FFs) |
 | Control & Exec | FSM, 32-bit ALU, Decoder, RVC Expander, ImmGen | 262 (192 FFs) | 269 (198 FFs) |
 
 ---
@@ -175,10 +172,10 @@ All benchmark results are fully reproducible. Run these commands from the repo r
 ```bash
 # 1. Build the Verilator simulation model
 cd bench
-make verilator-kavacha
+make verilator-mist-es
 
 # 2. Run CoreMark
-make run-kavacha-coremark ITERATIONS=1000
+make run-mist-es-coremark ITERATIONS=1000
 
 # 3. Run Dhrystone (from its own directory)
 cd ../dhrystone
@@ -196,18 +193,18 @@ Results are written to `bench/results/` as `.log` files and a summary `report.md
 ## Repository Layout
 
 ```
-kavacha/
+mist_es/
 ├── rtl/                 Core RTL
-│   ├── kavacha_core.sv    Multi-cycle control FSM + datapath
-│   ├── kavacha_soc.sv     Minimal SoC (IMEM/DRAM, tohost, Debug Module)
-│   ├── kavacha_debug.sv   JTAG DTM + RISC-V Debug Module
-│   ├── kavacha_axil.sv    AXI4-Lite master / slave / SoC wrapper
+│   ├── mist_es_core.sv    Multi-cycle control FSM + datapath
+│   ├── mist_es_soc.sv     Minimal SoC (IMEM/DRAM, tohost, Debug Module)
+│   ├── mist_es_debug.sv   JTAG DTM + RISC-V Debug Module
+│   ├── mist_es_axil.sv    AXI4-Lite master / slave / SoC wrapper
 │   └── common/            Shared, pre-verified datapath leaf cells
 │                          (ALU, multiply/divide, register file, CSR file,
 │                           immediate/branch units, decoder, RVC, PMP, ECC)
 ├── tb/                  Testbenches (smoke, RVFI, debug, AXI-Lite, ECC)
 ├── tools/               Golden ISA model + co-simulation driver
-├── third_party/         Official riscv-tests sources + Kavacha test environment
+├── third_party/         Official riscv-tests sources + MIST-ES test environment
 ├── tests/               expected.txt: recorded results for run_tests.sh
 ├── programs/            Test-program builders
 ├── sw/                  Assembly test programs & bring-up firmware
@@ -300,9 +297,9 @@ Result of the last run (Ubuntu 24.04, Icarus Verilog 12, Verilator 5.020, RISC-V
 
 `./run_isa.sh all` builds the official [riscv-tests](https://github.com/riscv/riscv-tests)
 (vendored under `third_party/riscv-tests` with their BSD license) and runs them on
-the core's own testbench (`tb/tb_kavacha.sv`) and SoC. The environment in
+the core's own testbench (`tb/tb_mist_es.sv`) and SoC. The environment in
 `third_party/riscv-tests/env` follows the riscv-test-env "p" environment, adapted
-to Kavacha: code is linked at `0x0` (IMEM), data at `0x8000_0000` (DRAM), and
+to MIST-ES: code is linked at `0x0` (IMEM), data at `0x8000_0000` (DRAM), and
 tohost is the SoC exit register at `0x2000_0000`. Because riscv-tests assume a
 single read/write memory, the testbench runs them with `+IMEM_WRITABLE`, a
 testbench-only option that lets data stores also update IMEM (`rv32uc/rvc`
@@ -324,7 +321,7 @@ Some rv32mi tests skip parts of themselves by design when a feature is absent:
 `breakpoint` (no trigger module) and `illegal` (no Supervisor mode).
 
 The ISA tests found three CSR bugs, fixed in this release:
-- `mstatus` stored every written bit, so `MPP` could hold Supervisor mode, which Kavacha does not have
+- `mstatus` stored every written bit, so `MPP` could hold Supervisor mode, which MIST-ES does not have
   (`rv32mi/illegal` hung). `mstatus` is now WARL: only MIE, MPIE, MPP (and MPRV with U-mode)
   exist, and `MPP` holds only implemented modes (always M in the default build).
 - `minstret` ignored writes and `minstreth` / `instreth` did not exist (`rv32mi/instret_overflow`).
@@ -340,7 +337,7 @@ The ISA tests found three CSR bugs, fixed in this release:
 - **`mtvec` MODE:** only direct mode is supported, but `mtvec` stores the MODE bits as written;
   software must write MODE = 0, otherwise traps jump to BASE + MODE.
 - **`mcycle` / `mcycleh`:** writes are ignored (the counter only counts).
-- **Memory map:** in `kavacha_soc` the IMEM is not writable by data stores (fetch port plus a
+- **Memory map:** in `mist_es_soc` the IMEM is not writable by data stores (fetch port plus a
   read-only data port); stores to that range are dropped.
 - The design has not had an independent security review, and riscv-formal has not been run.
 

@@ -46,7 +46,7 @@ _start:
      * The benchmark completes in ~170ms at 100 MHz — faster than the host
      * script can open the serial port.  Print a ready banner, then block on
      * RX until the host sends any character (run_hil_bench.py sends '\r').
-     * UART register map (kavacha_uart.sv):
+     * UART register map (mist_es_uart.sv):
      *   0x10000000 R : status — bit0=tx_busy, bit1=rx_ready
      *   0x10000004 R : rx data byte (reading clears rx_ready)
      * -------------------------------------------------------------------- */

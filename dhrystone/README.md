@@ -1,6 +1,6 @@
-# Dhrystone v2.1 Evaluation Suite for Kavacha
+# Dhrystone v2.1 Evaluation Suite for MIST-ES
 
-This document details the toolchain, compiler options, execution parameters, score calculations, and hardware benchmark results for the **Kavacha** RISC-V (RV32IMC) processor core running the **Dhrystone v2.1** benchmark.
+This document details the toolchain, compiler options, execution parameters, score calculations, and hardware benchmark results for the **MIST-ES** RISC-V (RV32IMC) processor core running the **Dhrystone v2.1** benchmark.
 
 ---
 
@@ -52,7 +52,7 @@ Dhrystone is built using the project's bundled GNU RISC-V toolchain with bare-me
 
 The industry-standard Dhrystone benchmark requires executing for at least 2 real-world seconds (≥ 100 million cycles for a 50 MHz core) to ensure statistically stable timing measurements:
 
-- **Iterations (`NUM_RUNS`)**: **100,000** (executes for ~141M cycles on Kavacha, clearing the 2-second threshold)
+- **Iterations (`NUM_RUNS`)**: **100,000** (executes for ~141M cycles on MIST-ES, clearing the 2-second threshold)
 - **Timeout**: 300,000,000 simulation cycles in Verilator
 
 ---

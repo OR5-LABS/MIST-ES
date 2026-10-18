@@ -1,4 +1,4 @@
-/* link.ld -- riscv-tests on the Kavacha SoC (Harvard memory map):
+/* link.ld -- riscv-tests on the MIST-ES SoC (Harvard memory map):
    code at 0x0000_0000 (IMEM, loaded from the .imem.hex image),
    data at 0x8000_0000 (DRAM, loaded from the .dram.hex image),
    tohost is the SoC exit register at 0x2000_0000. */

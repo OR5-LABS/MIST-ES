@@ -1,5 +1,5 @@
 # ============================================================================
-# kavacha_arty_a7.xdc — Digilent Arty A7-100T (xc7a100tcsg324-1), LVCMOS33.
+# mist_es_arty_a7.xdc — Digilent Arty A7-100T (xc7a100tcsg324-1), LVCMOS33.
 # ============================================================================
 
 # 100 MHz system clock (board oscillator)

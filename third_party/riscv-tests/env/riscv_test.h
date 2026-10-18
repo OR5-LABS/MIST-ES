@@ -1,4 +1,4 @@
-// riscv_test.h -- Kavacha bare-metal environment for the official riscv-tests.
+// riscv_test.h -- MIST-ES bare-metal environment for the official riscv-tests.
 //
 // Modeled on the riscv-test-env "p" environment (physical memory, no virtual
 // memory, one hart): the test starts at _start, a reset sequence initializes
@@ -8,14 +8,14 @@
 //   1 = PASS, (n << 1) | 1 = test case n failed,
 //   TESTNUM | 1337 = unexpected trap and the test has no mtvec_handler.
 //
-// Kavacha-specific adaptation (see link.ld):
-//   * code (.text.init/.text) is linked at 0x0000_0000 (Kavacha IMEM: fetch
+// MIST-ES-specific adaptation (see link.ld):
+//   * code (.text.init/.text) is linked at 0x0000_0000 (MIST-ES IMEM: fetch
 //     port plus a read-only data port); data (.data/.rodata/.bss) is linked
 //     at 0x8000_0000 (DRAM).
-//   * tohost is the Kavacha SoC exit register at 0x2000_0000 (linker symbol).
+//   * tohost is the MIST-ES SoC exit register at 0x2000_0000 (linker symbol).
 // The riscv-tests LICENSE (BSD-3-Clause) is in ../LICENSE.
-#ifndef _ENV_KAVACHA_RISCV_TEST_H
-#define _ENV_KAVACHA_RISCV_TEST_H
+#ifndef _ENV_MIST_ES_RISCV_TEST_H
+#define _ENV_MIST_ES_RISCV_TEST_H
 
 #include "encoding.h"
 

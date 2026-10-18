@@ -1,4 +1,4 @@
-/* fpga_hello.ld — single unified RAM at 0x0 (matches kavacha_fpga).
+/* fpga_hello.ld — single unified RAM at 0x0 (matches mist_es_fpga).
    .text + .rodata + .data all live in the low RAM; stack grows down from the
    top (set in _start). No DRAM region — the FPGA demo SoC has one RAM. */
 OUTPUT_ARCH(riscv)

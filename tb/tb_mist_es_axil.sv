@@ -1,10 +1,10 @@
-// tb_kavacha_axil.sv — run the smoke through a real AXI4-Lite master<->slave link.
+// tb_mist_es_axil.sv — run the smoke through a real AXI4-Lite master<->slave link.
 `timescale 1ns/1ps
-module tb_kavacha_axil;
+module tb_mist_es_axil;
   logic clk=1'b0; always #5 clk=~clk;
   logic rst; logic [31:0] tohost; logic tohost_we;
 
-  kavacha_axil_soc dut (.clk(clk), .rst(rst), .tohost(tohost), .tohost_we(tohost_we));
+  mist_es_axil_soc dut (.clk(clk), .rst(rst), .tohost(tohost), .tohost_we(tohost_we));
 
   string hexf; integer i, cyc=0;
   initial begin

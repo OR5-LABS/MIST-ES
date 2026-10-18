@@ -1,14 +1,14 @@
 // ============================================================================
-// kavacha_decode.sv — base RV32IM(C) instruction decoder (shared leaf cell).
+// mist_es_decode.sv — base RV32IM(C) instruction decoder (shared leaf cell).
 //
 // One combinational decode of the (already RVC-expanded) 32-bit instruction
 // into the control bundle + the selected immediate. This is the single source
 // of truth for instruction decoding, shared by the core and its leaf cells.
 // ============================================================================
-`include "kavacha_pkg.sv"
+`include "mist_es_pkg.sv"
 
-module kavacha_decode
-  import kavacha_pkg::*;
+module mist_es_decode
+  import mist_es_pkg::*;
 (
   input  logic [31:0]     instr,
   input  logic [XLEN-1:0] imm_i,

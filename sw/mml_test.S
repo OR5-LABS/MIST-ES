@@ -1,4 +1,4 @@
-// mml_test.S — Smepmp Machine Mode Lockdown (mseccfg.MML) on Kavacha SECURE.
+// mml_test.S — Smepmp Machine Mode Lockdown (mseccfg.MML) on MIST-ES SECURE.
 // With MML set, L=1 rules are M-mode-only, L=0 rules are U-mode-only, M-mode may
 // not execute from memory that matches no rule, new executable M-mode rules
 // cannot be added, and RLB cannot be set while any rule is locked.

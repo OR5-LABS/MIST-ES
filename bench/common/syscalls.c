@@ -1,5 +1,5 @@
 /* ============================================================================
- * syscalls.c — Minimal newlib/libnosys stubs for Kavacha bare-metal targets.
+ * syscalls.c — Minimal newlib/libnosys stubs for MIST-ES bare-metal targets.
  *
  * _write    → routes stdout/stderr through a character-by-character tohost
  *             side channel (the harness ignores these, but CoreMark uses

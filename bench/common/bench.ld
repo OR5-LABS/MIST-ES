@@ -1,5 +1,5 @@
 /* ============================================================================
- * bench.ld — Unified linker script for Kavacha benchmark targets.
+ * bench.ld — Unified linker script for MIST-ES benchmark targets.
  *
  * Memory map:
  *   IMEM  0x00000000 – 0x0000FFFF  (64 KB) — code + rodata + .data image

@@ -1,5 +1,5 @@
 /* ============================================================================
- * core_portme.c — CoreMark port implementation for Kavacha bare-metal.
+ * core_portme.c — CoreMark port implementation for MIST-ES bare-metal.
  *
  * Implements the 5 required portability functions:
  *   portable_init()    — record cycle baseline
@@ -12,7 +12,7 @@
  * ============================================================================ */
 
 #include "coremark.h"
-#include "../../common/kavacha_io.h"
+#include "../../common/mist_es_io.h"
 
 /* Global timing state */
 CORETIMETYPE start_time_val;
@@ -56,7 +56,7 @@ secs_ret time_in_secs(CORETIMETYPE ticks)
 void portable_init(core_portable *p, int *argc, char *argv[])
 {
     (void)argc; (void)argv;
-    p->portable_id = 0x4B415641u; /* 'KAVA' */
+    p->portable_id = 0x4D495354u; /* 'MIST' */
 }
 
 void portable_fini(core_portable *p)

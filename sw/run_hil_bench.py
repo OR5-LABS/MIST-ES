@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-run_hil_bench.py — Host-side capture and analysis for Kavacha FPGA HIL benchmarks.
+run_hil_bench.py — Host-side capture and analysis for MIST-ES FPGA HIL benchmarks.
 
 Connects to the Arty A7-100T over USB-UART, captures benchmark output,
 parses cycle counts, and appends results to results/hil_report.md.
@@ -145,7 +145,7 @@ def flash_mem(mem_path, bit_path, build_dir, fpga="arty_a7_100t"):
     """
     import shutil
     tcl_script = os.path.abspath(os.path.join(os.path.dirname(bit_path), "../" + os.path.basename(bit_path).replace(".bit", ".tcl")))
-    # tcl_script is fpga/arty_a7/kavacha_arty_a7.tcl → go up two dirs to reach repo root, then sw/firmware.mem
+    # tcl_script is fpga/arty_a7/mist_es_arty_a7.tcl → go up two dirs to reach repo root, then sw/firmware.mem
     repo_root  = os.path.abspath(os.path.join(os.path.dirname(tcl_script), "../.."))
     fw_mem     = os.path.join(repo_root, "sw", "firmware.mem")
 
@@ -215,7 +215,7 @@ def generate_report(all_results, freq_mhz, out_dir):
     md_mode = "a" if os.path.exists(report_path) else "w"
     with open(report_path, md_mode) as f:
         if md_mode == "w":
-            f.write(f"# Kavacha HIL Benchmark Report — Arty A7-100T\n\n")
+            f.write(f"# MIST-ES HIL Benchmark Report — Arty A7-100T\n\n")
             f.write(f"Generated: {now}  \n")
             f.write(f"Clock: **{freq_mhz} MHz**  \n")
             f.write(f"Method: Hardware-in-the-Loop (physical FPGA, UART capture)  \n\n")
@@ -277,7 +277,7 @@ def generate_report(all_results, freq_mhz, out_dir):
 
 # ---- Main ------------------------------------------------------------------
 def main():
-    parser = argparse.ArgumentParser(description="Kavacha FPGA HIL benchmark runner")
+    parser = argparse.ArgumentParser(description="MIST-ES FPGA HIL benchmark runner")
     parser.add_argument("--port",    default=None,        help="Serial port (e.g. /dev/ttyUSB1)")
     parser.add_argument("--baud",    type=int, default=115200, help="Baud rate (default: 115200)")
     parser.add_argument("--bench",   default="coremark",  help="Benchmark: coremark | dhrystone | all")
@@ -298,7 +298,7 @@ def main():
     mem_dir = args.mem_dir or os.path.join(script_dir, "hil_build")
     out_dir = args.out     or os.path.join(bench_dir, "results")
 
-    default_bit = os.path.join(root_dir, "fpga", "arty_a7", "build", "kavacha_arty_a7.bit")
+    default_bit = os.path.join(root_dir, "fpga", "arty_a7", "build", "mist_es_arty_a7.bit")
     bit_path = args.bit or default_bit
 
     # Determine which benchmarks to run

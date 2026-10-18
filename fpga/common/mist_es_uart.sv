@@ -1,5 +1,5 @@
 // ============================================================================
-// kavacha_uart.sv  --  Synthesizable 8-N-1 UART with sim-friendly $write hook.
+// mist_es_uart.sv  --  Synthesizable 8-N-1 UART with sim-friendly $write hook.
 //
 // Backward-compatible register map (matches the previous sim-only UART):
 //   0x0 W : tx data byte (writes push the byte to the TX shift register)
@@ -22,7 +22,7 @@
 
 `default_nettype none
 
-module kavacha_uart #(
+module mist_es_uart #(
   parameter int CLK_HZ       = 50_000_000,
   parameter int BAUD         = 115_200,
   parameter int BAUD_DIV_RST = CLK_HZ / BAUD

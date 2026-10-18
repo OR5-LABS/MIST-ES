@@ -11,7 +11,7 @@
  * ============================================================================ */
 
 #include "coremark.h"
-#include "../../bench/common/kavacha_io.h"
+#include "../../bench/common/mist_es_io.h"
 
 /* The FPGA CoreMark build defines FPGA_HIL so this file is selected instead
  * of the standard port. */
@@ -57,7 +57,7 @@ secs_ret time_in_secs(CORETIMETYPE ticks)
 void portable_init(core_portable *p, int *argc, char *argv[])
 {
     (void)argc; (void)argv;
-    p->portable_id = 0x4B415641u; /* 'KAVA' */
+    p->portable_id = 0x4D495354u; /* 'MIST' */
 }
 
 void portable_fini(core_portable *p)

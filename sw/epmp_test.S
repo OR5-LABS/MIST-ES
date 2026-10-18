@@ -1,4 +1,4 @@
-// epmp_test.S — directed test of ePMP (Smepmp) mseccfg.MMWP on Kavacha SECURE.
+// epmp_test.S — directed test of ePMP (Smepmp) mseccfg.MMWP on MIST-ES SECURE.
 // MMWP = "M-mode whitelist": with it set, an M-mode access that matches NO PMP
 // region is DENIED (default-deny), instead of the normal M-mode allow. The test
 // whitelists the code region (X|R) and the tohost word (R|W), enables MMWP, then

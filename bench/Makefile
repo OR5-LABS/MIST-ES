@@ -1,9 +1,9 @@
 ###############################################################################
-# bench/Makefile — Kavacha benchmark suite (CoreMark)
+# bench/Makefile — MIST-ES benchmark suite (CoreMark)
 #
-# ---- Kavacha targets --------------------------------------------------------
-#   make verilator-kavacha    — build Kavacha Verilator model
-#   make run-kavacha          — run all benchmarks on Kavacha
+# ---- MIST-ES targets --------------------------------------------------------
+#   make verilator-mist-es    — build MIST-ES Verilator model
+#   make run-mist-es          — run all benchmarks on MIST-ES
 #   make coremark             — compile CoreMark
 #   make report               — generate benchmark report
 #   make all                  — build & run everything
@@ -22,8 +22,8 @@ RTL_DIR     := $(ROOT_DIR)/rtl
 RTL_COMMON  := $(RTL_DIR)/common
 
 BUILD_DIR   := $(BENCH_DIR)/build
-V_BUILD_DIR := /tmp/kavacha_sim_$(USER)
-WORKSPACE_LINK := /tmp/kavacha_workspace
+V_BUILD_DIR := /tmp/mist_es_sim_$(USER)
+WORKSPACE_LINK := /tmp/mist_es_workspace
 SIM_DIR     := $(ROOT_DIR)/sim
 RESULTS_DIR := $(BENCH_DIR)/results
 
@@ -100,41 +100,41 @@ $(COREMARK_SRC)/.git:
 	fi
 
 ###############################################################################
-# verilator — build Kavacha simulation model
+# verilator — build MIST-ES simulation model
 ###############################################################################
 VERILATOR_SV := \
-    rtl/common/kavacha_pkg.sv \
-    rtl/common/kavacha_alu.sv \
-    rtl/common/kavacha_regfile.sv \
-    rtl/common/kavacha_muldiv.sv \
-    rtl/common/kavacha_csr.sv \
-    rtl/common/kavacha_rvc.sv \
-    rtl/common/kavacha_immgen.sv \
-    rtl/common/kavacha_branch.sv \
-    rtl/common/kavacha_decode.sv \
-    rtl/common/kavacha_pmp.sv \
-    rtl/kavacha_core.sv \
-    rtl/kavacha_debug.sv \
+    rtl/common/mist_es_pkg.sv \
+    rtl/common/mist_es_alu.sv \
+    rtl/common/mist_es_regfile.sv \
+    rtl/common/mist_es_muldiv.sv \
+    rtl/common/mist_es_csr.sv \
+    rtl/common/mist_es_rvc.sv \
+    rtl/common/mist_es_immgen.sv \
+    rtl/common/mist_es_branch.sv \
+    rtl/common/mist_es_decode.sv \
+    rtl/common/mist_es_pmp.sv \
+    rtl/mist_es_core.sv \
+    rtl/mist_es_debug.sv \
     bench/verilator/bench_top.sv
 
 VERILATOR_CPP := bench/verilator/main.cpp
 
 SIM_BIN := $(V_BUILD_DIR)/Vbench_obj/Vbench_top
 
-.PHONY: verilator verilator-kavacha
+.PHONY: verilator verilator-mist-es
 verilator: $(SIM_BIN)
-verilator-kavacha: $(SIM_BIN)
+verilator-mist-es: $(SIM_BIN)
 
 $(SIM_BIN): $(VERILATOR_SV:%=$(ROOT_DIR)/%) $(ROOT_DIR)/$(VERILATOR_CPP) | $(SIM_DIR)
 	@echo "[VERILATOR] Creating workspace symlink to bypass space-in-path limits..."
 	ln -sfn "$(realpath $(ROOT_DIR))" $(WORKSPACE_LINK)
-	@echo "[VERILATOR] Building Kavacha simulation model in safe temp directory..."
+	@echo "[VERILATOR] Building MIST-ES simulation model in safe temp directory..."
 	mkdir -p $(V_BUILD_DIR)/Vbench_obj
 	$(VERILATOR) --Mdir "$(V_BUILD_DIR)/Vbench_obj" -o Vbench_top \
-	    -f $(WORKSPACE_LINK)/bench/verilator/kavacha.f \
+	    -f $(WORKSPACE_LINK)/bench/verilator/mist_es.f \
 	    $(VERILATOR_SV:%=$(WORKSPACE_LINK)/%) \
 	    $(WORKSPACE_LINK)/$(VERILATOR_CPP)
-	@echo "[VERILATOR] Kavacha build complete: $@"
+	@echo "[VERILATOR] MIST-ES build complete: $@"
 
 $(SIM_DIR):
 	mkdir -p $@
@@ -202,52 +202,52 @@ $(BUILD_DIR):
 ###############################################################################
 TIMEOUT_CYCLES ?= 2000000000  # 2 Billion cycles
 
-KAVACHA_RESULTS := $(RESULTS_DIR)/kavacha
+MIST_ES_RESULTS := $(RESULTS_DIR)/mist_es
 
-.PHONY: run-coremark run-kavacha-coremark
-run-coremark: run-kavacha-coremark
-run-kavacha-coremark: $(SIM_BIN) $(COREMARK_HEX) | $(KAVACHA_RESULTS) $(RESULTS_DIR)
-	@echo "[RUN/Kavacha] CoreMark..."
+.PHONY: run-coremark run-mist-es-coremark
+run-coremark: run-mist-es-coremark
+run-mist-es-coremark: $(SIM_BIN) $(COREMARK_HEX) | $(MIST_ES_RESULTS) $(RESULTS_DIR)
+	@echo "[RUN/MIST-ES] CoreMark..."
 	set -o pipefail; $(SIM_BIN) --hex $(COREMARK_HEX) --name coremark \
 	    --max-cycles $(TIMEOUT_CYCLES) \
-	    | tee $(KAVACHA_RESULTS)/coremark.log
+	    | tee $(MIST_ES_RESULTS)/coremark.log
 
 DHRYSTONE_HEX ?= $(ROOT_DIR)/dhrystone/build/dhrystone.hex
 
-.PHONY: run-dhrystone run-kavacha-dhrystone
-run-dhrystone: run-kavacha-dhrystone
-run-kavacha-dhrystone: $(SIM_BIN) | $(KAVACHA_RESULTS) $(RESULTS_DIR)
+.PHONY: run-dhrystone run-mist-es-dhrystone
+run-dhrystone: run-mist-es-dhrystone
+run-mist-es-dhrystone: $(SIM_BIN) | $(MIST_ES_RESULTS) $(RESULTS_DIR)
 	@set -o pipefail; HEX=$${HEX_FILE:-$(DHRYSTONE_HEX)}; \
-	echo "[RUN/Kavacha] Dhrystone ($$HEX)..."; \
+	echo "[RUN/MIST-ES] Dhrystone ($$HEX)..."; \
 	$(SIM_BIN) --hex "$$HEX" --name dhrystone \
 	    --max-cycles $(TIMEOUT_CYCLES) \
-	    | tee $(KAVACHA_RESULTS)/dhrystone.log
+	    | tee $(MIST_ES_RESULTS)/dhrystone.log
 
 
-.PHONY: run-kavacha run-all
-run-kavacha: run-kavacha-coremark
-run-all: run-kavacha
+.PHONY: run-mist-es run-all
+run-mist-es: run-mist-es-coremark
+run-all: run-mist-es
 
 $(RESULTS_DIR):
 	mkdir -p $@
 
-$(KAVACHA_RESULTS):
+$(MIST_ES_RESULTS):
 	mkdir -p $@
 
 ###############################################################################
-# report — benchmark report (Kavacha)
+# report — benchmark report (MIST-ES)
 ###############################################################################
 .PHONY: report
-report: run-kavacha | $(RESULTS_DIR)
+report: run-mist-es | $(RESULTS_DIR)
 	python3 $(BENCH_DIR)/run_bench.py \
-	    --results-dir $(RESULTS_DIR) \
+	    --results-dir $(MIST_ES_RESULTS) \
 	    --iterations $(ITERATIONS)
 
 ###############################################################################
 # all
 ###############################################################################
 .PHONY: all
-all: fetch verilator-kavacha coremark run-kavacha report
+all: fetch verilator-mist-es coremark run-mist-es report
 
 ###############################################################################
 # clean / distclean / help
@@ -261,13 +261,13 @@ distclean: clean
 	rm -rf $(COREMARK_SRC)
 
 help:
-	@echo "Kavacha Benchmark Suite (CoreMark)"
+	@echo "MIST-ES Benchmark Suite (CoreMark)"
 	@echo ""
 	@echo "  make all              — fetch + build + run + report"
 	@echo "  make fetch            — clone CoreMark source"
-	@echo "  make verilator-kavacha — build Kavacha Verilator simulation model"
+	@echo "  make verilator-mist-es — build MIST-ES Verilator simulation model"
 	@echo "  make coremark         — compile CoreMark (ITERATIONS=$(ITERATIONS))"
-	@echo "  make run-kavacha      — run CoreMark on Kavacha"
+	@echo "  make run-mist-es      — run CoreMark on MIST-ES"
 	@echo "  make report           — generate results report"
 	@echo "  make clean            — remove build/ and results/"
 	@echo "  make distclean        — also remove fetched sources"

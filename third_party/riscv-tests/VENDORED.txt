@@ -3,5 +3,5 @@ Vendored from https://github.com/riscv/riscv-tests, commit 34e6b6d1e7936b5260754
 isa/rv32ui, rv32um, rv32uc, rv32mi, the rv64ui/rv64uc/rv64mi/rv64si files they #include,
 and isa/macros/scalar/test_macros.h. Unmodified; license in LICENSE (BSD-3-Clause).
 
-env/ is not from riscv-tests: it is a Kavacha environment written for this repo
+env/ is not from riscv-tests: it is a MIST-ES environment written for this repo
 (riscv_test.h modeled on riscv-test-env "p", a constant subset in encoding.h, link.ld).

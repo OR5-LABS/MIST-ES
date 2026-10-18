@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Co-simulation harness: diff the Kavacha RTL retire trace against the
+"""Co-simulation harness: diff the MIST-ES RTL retire trace against the
 golden RV32IM ISA model, instruction by instruction.
 
   python tools/cosim.py --hex programs/build/smoke.hex \
-      --sim sim/tb_kavacha
+      --sim sim/tb_mist_es
 
 Exit code 0 = traces match (RTL is ISA-correct); non-zero = mismatch.
 """

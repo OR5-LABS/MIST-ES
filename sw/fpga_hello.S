@@ -1,11 +1,11 @@
 # ============================================================================
-# fpga_hello.S — Kavacha FPGA bring-up demo (bare-metal, RV32IMC).
+# fpga_hello.S — MIST-ES FPGA bring-up demo (bare-metal, RV32IMC).
 #
 # Prints a banner over the UART (0x1000_0000) and blinks the 8 user LEDs
 # (0x2000_1000) in a loop. Self-contained: no .data/.bss, stack at top of the
 # unified RAM. Links at 0x0 (core reset vector). Build: ../sw/build_fpga_hello.sh
 #
-# UART register map (kavacha_uart):
+# UART register map (mist_es_uart):
 #   0x10000000 R: status (bit0 = tx_busy)   W: tx data byte
 # ============================================================================
     .section .text.init
@@ -48,4 +48,4 @@ puts_done:
 
     .section .rodata
 msg:
-    .asciz "Hello from Kavacha on FPGA!\r\n"
+    .asciz "Hello from MIST-ES on FPGA!\r\n"
