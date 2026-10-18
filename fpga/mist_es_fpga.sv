@@ -1,5 +1,5 @@
 // ============================================================================
-// kavacha_fpga.sv — Synthesizable FPGA SoC for Kavacha (RV32IMC).
+// mist_es_fpga.sv — Synthesizable FPGA SoC for MIST-ES (RV32IMC).
 //
 // Self-contained, board-independent SoC for real-hardware bring-up:
 //   * Unified distributed-RAM (LUTRAM, async/combinational read) holding code +
@@ -9,7 +9,7 @@
 //   * Real synthesizable UART (synthesizable 8-N-1) @ 0x1000_0000.
 //   * 8 user LEDs @ 0x2000_1000; tohost @ 0x2000_0000 (sim/bring-up handshake).
 //   * Minimal CLINT (msip/mtime/mtimecmp) @ 0x0200_0000 for timer/soft IRQ.
-//   * RISC-V Debug Module + JTAG DTM (kavacha_debug) — drive from OpenOCD.
+//   * RISC-V Debug Module + JTAG DTM (mist_es_debug) — drive from OpenOCD.
 //
 // Address map:
 //   0x0000_0000.. : RAM (MEM_WORDS words)
@@ -18,11 +18,11 @@
 //   0x2000_0000   : tohost
 //   0x2000_1000   : LED register (low 8 bits)
 // ============================================================================
-`include "kavacha_pkg.sv"
+`include "mist_es_pkg.sv"
 `default_nettype none
 
-module kavacha_fpga
-  import kavacha_pkg::*;
+module mist_es_fpga
+  import mist_es_pkg::*;
 #(
   parameter int CLK_HZ     = 50_000_000,
   parameter int UART_BAUD  = 115_200,
@@ -86,7 +86,7 @@ module kavacha_fpga
   wire        irq_timer = (mtime >= mtimecmp);
   wire        irq_soft  = msip;
 
-  kavacha_core #(.SECURE(SECURE)) u_core (
+  mist_es_core #(.SECURE(SECURE)) u_core (
     .clk(clk), .rst(core_rst),
     .imem_addr(imem_addr), .imem_rdata(imem_rdata),
     .dmem_addr(dmem_addr), .dmem_re(dmem_re), .dmem_we(dmem_we),
@@ -101,7 +101,7 @@ module kavacha_fpga
     .dbg_ar_rdata(dbg_ar_rdata), .dbg_ar_done(dbg_ar_done)
   );
 
-  kavacha_debug u_dbg (
+  mist_es_debug u_dbg (
     .clk(clk), .rst(rst), .tck(tck), .tms(tms), .tdi(tdi), .tdo(tdo),
     .dbg_haltreq(dbg_haltreq), .dbg_resumereq(dbg_resumereq),
     .ndmreset(ndmreset), .dbg_halted(dbg_halted),
@@ -136,7 +136,7 @@ module kavacha_fpga
 
   // ---- UART ----------------------------------------------------------------
   wire [7:0] uart_rdata; wire uart_tx_irq, uart_rx_irq;
-  kavacha_uart #(.CLK_HZ(CLK_HZ), .BAUD(UART_BAUD)) u_uart (
+  mist_es_uart #(.CLK_HZ(CLK_HZ), .BAUD(UART_BAUD)) u_uart (
     .clk(clk), .rst(rst), .addr(dmem_addr[3:0]), .wdata(dmem_wdata[7:0]),
     .we(dmem_we && uart_sel), .re(dmem_re && uart_sel), .rdata(uart_rdata),
     .serial_tx(serial_tx), .serial_rx(serial_rx),

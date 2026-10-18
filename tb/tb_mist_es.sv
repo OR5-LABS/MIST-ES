@@ -1,11 +1,11 @@
 // ============================================================================
-// tb_kavacha.sv — Self-checking testbench for kavacha_soc.
+// tb_mist_es.sv — Self-checking testbench for mist_es_soc.
 //
-//   vvp sim/tb_kavacha +IMEM=programs/build/smoke.hex
-//   vvp sim/tb_kavacha +IMEM=... +TRACE=1   (emit retire trace for co-sim)
-//   vvp sim/tb_kavacha +IMEM=... +DRAM=<hex>  (also preload DRAM @0x8000_0000)
-//   vvp sim/tb_kavacha +IMEM=... +MAXCYC=<n>  (cycle limit, default 200000)
-//   vvp sim/tb_kavacha +IMEM=... +IMEM_WRITABLE
+//   vvp sim/tb_mist_es +IMEM=programs/build/smoke.hex
+//   vvp sim/tb_mist_es +IMEM=... +TRACE=1   (emit retire trace for co-sim)
+//   vvp sim/tb_mist_es +IMEM=... +DRAM=<hex>  (also preload DRAM @0x8000_0000)
+//   vvp sim/tb_mist_es +IMEM=... +MAXCYC=<n>  (cycle limit, default 200000)
+//   vvp sim/tb_mist_es +IMEM=... +IMEM_WRITABLE
 //       testbench memory model only: data stores into the IMEM window also
 //       update IMEM (the SoC's IMEM is fetch + read-only data). run_isa.sh uses
 //       it because riscv-tests expect one read/write memory (rv32uc/rvc stores
@@ -17,7 +17,7 @@
 // ============================================================================
 `timescale 1ns/1ps
 
-module tb_kavacha;
+module tb_mist_es;
   logic clk = 1'b0;
   always #5 clk = ~clk;
 
@@ -30,7 +30,7 @@ module tb_kavacha;
   logic        retire_rd_we;
   logic [4:0]  retire_rd;
 
-  kavacha_soc dut (
+  mist_es_soc dut (
     .clk(clk), .rst(rst),
     .tck(1'b0), .tms(1'b0), .tdi(1'b0), .tdo(),
     .tohost(tohost), .tohost_we(tohost_we),
@@ -67,8 +67,8 @@ module tb_kavacha;
     end
 
     if ($test$plusargs("VCD")) begin
-      $dumpfile("tb_kavacha.vcd");
-      $dumpvars(0, tb_kavacha);
+      $dumpfile("tb_mist_es.vcd");
+      $dumpvars(0, tb_mist_es);
     end
 
     rst = 1'b1;

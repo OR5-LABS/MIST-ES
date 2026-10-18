@@ -1,13 +1,13 @@
 /* ============================================================================
- * kavacha_io.h — Hardware I/O macros for Kavacha bare-metal benchmarks.
+ * mist_es_io.h — Hardware I/O macros for MIST-ES bare-metal benchmarks.
  *
  * CSR addresses used:
  *   0xB00  mcycle   — machine-mode cycle counter low 32 bits
  *   0xB80  mcycleh  — machine-mode cycle counter high 32 bits
  * ============================================================================ */
 
-#ifndef KAVACHA_IO_H
-#define KAVACHA_IO_H
+#ifndef MIST_ES_IO_H
+#define MIST_ES_IO_H
 
 #include <stdint.h>
 
@@ -54,4 +54,4 @@ static inline void report_cycles(uint64_t cycles)
     write_tohost(0x80000000u | lo);
 }
 
-#endif /* KAVACHA_IO_H */
+#endif /* MIST_ES_IO_H */

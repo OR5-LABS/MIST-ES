@@ -1,23 +1,23 @@
 // =============================================================================
 // bench_top.sv — Benchmark SoC wrapper for Verilator.
 //
-// Functionally identical to kavacha_soc but:
+// Functionally identical to mist_es_soc but:
 //   • IMEM/DRAM enlarged to 64 KB each (covers CoreMark binaries)
 //   • Memories annotated /* verilator public_flat_rw */ so C++ harness can
 //     load .hex images directly before simulation starts.
 //   • tohost / tohost_we exposed as top-level outputs.
 //   • $readmemh / $value$plusargs path kept as a fallback for iverilog.
 //
-// Address map (identical to kavacha_soc):
+// Address map (identical to mist_es_soc):
 //   IMEM  0x0000_0000 – 0x0000_FFFF  (64 KB, 16384 words)
 //   DRAM  0x8000_0000 – 0x8000_FFFF  (64 KB, 16384 words)
 //   CLINT 0x0200_xxxx
 //   tohost 0x2000_0000
 // =============================================================================
-`include "kavacha_pkg.sv"
+`include "mist_es_pkg.sv"
 
 module bench_top
-  import kavacha_pkg::*;
+  import mist_es_pkg::*;
 #(
   parameter int unsigned IMEM_WORDS = 16384,   // 64 KB
   parameter int unsigned DRAM_WORDS = 16384,   // 64 KB
@@ -78,7 +78,7 @@ module bench_top
   logic            retire_rd_we;
   logic [4:0]      retire_rd;
 
-  kavacha_core #(.SECURE(1'b0)) u_core (
+  mist_es_core #(.SECURE(1'b0)) u_core (
     .clk(clk), .rst(core_rst),
     .imem_addr(imem_addr), .imem_rdata(imem_rdata),
     .dmem_addr(dmem_addr), .dmem_re(dmem_re), .dmem_we(dmem_we),
@@ -96,7 +96,7 @@ module bench_top
     .dbg_ar_done(dbg_ar_done)
   );
 
-  kavacha_debug u_dbg (
+  mist_es_debug u_dbg (
     .clk(clk), .rst(rst),
     .tck(tck), .tms(tms), .tdi(tdi), .tdo(tdo),
     .dbg_haltreq(dbg_haltreq), .dbg_resumereq(dbg_resumereq),

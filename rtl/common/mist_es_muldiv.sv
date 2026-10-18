@@ -1,5 +1,5 @@
 // ============================================================================
-// kavacha_muldiv.sv — RV32M multiply/divide unit (multi-cycle).
+// mist_es_muldiv.sv — RV32M multiply/divide unit (multi-cycle).
 //
 //   * MUL family : 1-cycle latched 64-bit product (picks hi/lo, signedness).
 //   * DIV family : iterative shift-subtract over magnitudes (32 steps) plus a
@@ -8,10 +8,10 @@
 // Handshake: pulse `start` for one cycle with op/a/b valid. `busy` stays high
 // while computing; `done` pulses for one cycle when `result` is valid.
 // ============================================================================
-`include "kavacha_pkg.sv"
+`include "mist_es_pkg.sv"
 
-module kavacha_muldiv
-  import kavacha_pkg::*;
+module mist_es_muldiv
+  import mist_es_pkg::*;
 (
   input  logic              clk,
   input  logic              rst,

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# run_tests.sh -- run every Kavacha test target and compare its exit code and
+# run_tests.sh -- run every MIST-ES test target and compare its exit code and
 # PASS/FAIL verdict-line counts with the recorded baseline in tests/expected.txt.
 # Most testbenches end with $finish, so exit codes alone cannot be trusted;
 # counting verdict lines also catches silent failures and silently removed tests.

@@ -1,13 +1,13 @@
 // ============================================================================
-// tb_kavacha_fpga.sv — sim check of the synthesizable FPGA SoC.
+// tb_mist_es_fpga.sv — sim check of the synthesizable FPGA SoC.
 // Boots firmware.mem ($readmemh) and verifies the demo actually runs on the
 // real SoC: UART transmits the banner and the LEDs are driven. The UART's
 // $write (translate_off) echoes the banner to the console too.
-//   vvp sim/tb_kavacha_fpga +MEM=../sw/firmware.mem
+//   vvp sim/tb_mist_es_fpga +MEM=../sw/firmware.mem
 // ============================================================================
 `timescale 1ns/1ps
 
-module tb_kavacha_fpga;
+module tb_mist_es_fpga;
   logic clk = 1'b0; always #5 clk = ~clk;
   logic rst;
   logic [7:0] leds; logic serial_tx; logic [31:0] tohost; logic tohost_we;
@@ -16,7 +16,7 @@ module tb_kavacha_fpga;
   // fast UART baud for sim (real boards use 115200); MEM defaults to firmware.mem
   initial if (!$value$plusargs("MEM=%s", memf)) memf = "sw/firmware.mem";
 
-  kavacha_fpga #(.CLK_HZ(50_000_000), .UART_BAUD(12_500_000),
+  mist_es_fpga #(.CLK_HZ(50_000_000), .UART_BAUD(12_500_000),
                  .MEM_WORDS(4096), .MEMFILE("sw/firmware.mem")) dut (
     .clk(clk), .rst(rst), .tck(1'b0), .tms(1'b0), .tdi(1'b0), .tdo(),
     .leds(leds), .serial_tx(serial_tx), .serial_rx(1'b1),

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-run_bench.py — Parse Kavacha benchmark logs and emit report files.
+run_bench.py — Parse MIST-ES benchmark logs and emit report files.
 
 Usage:
     python3 run_bench.py --results-dir results/ --iterations 1000
@@ -47,14 +47,14 @@ def fmt(n, sep=True):
 
 
 def write_report(results_dir: Path, iterations: int):
-    """Generate Kavacha benchmark report."""
+    """Generate MIST-ES benchmark report."""
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     cm = parse_log(results_dir / "coremark.log")
     cm_cycles = cm["bench_cycles"] if cm["bench_cycles"] else cm["sim_cycles"]
     cpi = cm_cycles / iterations if cm_cycles else None
 
     md = [
-        "# Kavacha Benchmark Results",
+        "# MIST-ES Benchmark Results",
         "",
         f"Generated: {now}  ",
         "Simulator: **Verilator** (cycle-accurate)  ",

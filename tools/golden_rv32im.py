@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Self-contained RV32IM golden ISA simulator for Kavacha.
+"""Self-contained RV32IM golden ISA simulator for MIST-ES.
 
 Functional, per-instruction reference. Loads the same $readmemh image the RTL
-testbench runs and emits a retire trace in the exact format tb_kavacha.sv
+testbench runs and emits a retire trace in the exact format tb_mist_es.sv
 prints under +TRACE=1:
 
     RETIRE pc=%08x instr=%08x rdwe=%d rd=%d rdval=%08x
@@ -12,7 +12,7 @@ machine-mode CSRs, and ECALL/EBREAK/illegal -> mtvec / MRET, matching the
 core's in-order commit behaviour (a trapping instruction commits with no
 register write, then execution redirects).
 
-Memory map mirrors kavacha_soc.sv:
+Memory map mirrors mist_es_soc.sv:
     0x0000_0000.. IMEM   0x2000_0000 tohost(stop)   0x8000_0000.. DRAM
 """
 import sys

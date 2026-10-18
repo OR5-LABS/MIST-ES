@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Hand-assemble an RV32IM smoke test for the Kavacha core.
+"""Hand-assemble an RV32IM smoke test for the MIST-ES core.
 
 No GCC required. Emits programs/build/smoke.hex (one 32-bit word per line)
 for $readmemh. Convention: store 1 to tohost (0x2000_0000) on success, 2 on
@@ -215,6 +215,6 @@ out.mkdir(exist_ok=True)
 n = max(prog) // 4 + 1
 lines = [f"{prog.get(a*4, 0x00000013):08x}" for a in range(n)]
 (out / "smoke.hex").write_text("\n".join(lines) + "\n")
-print(f"Wrote {out/'smoke.hex'} — {n} words")
+print(f"Wrote programs/build/smoke.hex — {n} words")
 print(f"FAIL=0x{FAIL:08x}  spin=0x{spin:08x}  HANDLER=0x{HANDLER:08x}")
 assert FAIL < HANDLER, "code region overran the trap handler at 0x200!"

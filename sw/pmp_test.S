@@ -1,4 +1,4 @@
-// pmp_test.S — directed, self-checking test of Kavacha's PMP + M/U privilege.
+// pmp_test.S — directed, self-checking test of MIST-ES's PMP + M/U privilege.
 // Proves memory isolation: an M-mode monitor grants User mode R/W to one DRAM
 // region and X|R to the code region, then runs U-mode code that (1) legally
 // reads+writes the granted region and (2) is DENIED a store outside any region

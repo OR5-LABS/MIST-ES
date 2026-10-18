@@ -1,6 +1,6 @@
-# CoreMark Evaluation Suite for Kavacha
+# CoreMark Evaluation Suite for MIST-ES
 
-This document details the toolchain, compiler options, execution parameters, score calculations, and hardware benchmark results for the **Kavacha** RISC-V (RV32IMC) processor core running **EEMBC CoreMark**.
+This document details the toolchain, compiler options, execution parameters, score calculations, and hardware benchmark results for the **MIST-ES** RISC-V (RV32IMC) processor core running **EEMBC CoreMark**.
 
 ---
 

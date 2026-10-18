@@ -1,5 +1,5 @@
 /* ============================================================================
- * crt0.S — Bare-metal startup for Kavacha benchmark targets (RV32IMC).
+ * crt0.S — Bare-metal startup for MIST-ES benchmark targets (RV32IMC).
  *
  * Memory layout (bench.ld):
  *   IMEM  0x00000000  code + rodata + .data LMA (load image)

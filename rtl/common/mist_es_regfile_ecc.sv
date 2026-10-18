@@ -1,7 +1,7 @@
 // ============================================================================
-// kavacha_regfile_ecc.sv — 32x32 register file with SECDED ECC on the storage.
+// mist_es_regfile_ecc.sv — 32x32 register file with SECDED ECC on the storage.
 //
-// Drop-in for kavacha_regfile (same read/write ports) that protects every GPR
+// Drop-in for mist_es_regfile (same read/write ports) that protects every GPR
 // with a SECDED(39,32) Hamming code: single-bit storage errors are CORRECTED on
 // read, double-bit errors are DETECTED (flagged uncorrectable). This provides
 // register-file ECC hardening as a fault countermeasure.
@@ -12,10 +12,10 @@
 // 6 Hamming check bits (distinct nonzero, non-power-of-2 column codes per data
 // bit) + 1 overall parity = 7 ECC bits per 32-bit word.
 // ============================================================================
-`include "kavacha_pkg.sv"
+`include "mist_es_pkg.sv"
 
-module kavacha_regfile_ecc
-  import kavacha_pkg::*;
+module mist_es_regfile_ecc
+  import mist_es_pkg::*;
 #(
   parameter bit WRITE_FIRST = 1
 )(

@@ -4,12 +4,11 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
-GCC_BIN="$ROOT/verification/tools/gcc/bin/riscv-none-elf-gcc"
-OBJCOPY_BIN="$ROOT/verification/tools/gcc/bin/riscv-none-elf-objcopy"
-
-if command -v "$GCC_BIN" &>/dev/null; then
-    GCC="$GCC_BIN"
-    OBJCOPY="$OBJCOPY_BIN"
+# Detect RISC-V GCC
+TC="${RISCV_TC:-}"
+if [[ -n "$TC" && -x "$TC/riscv-none-elf-gcc" ]]; then
+    GCC="$TC/riscv-none-elf-gcc"
+    OBJCOPY="$TC/riscv-none-elf-objcopy"
 elif command -v riscv-none-elf-gcc &>/dev/null; then
     GCC="riscv-none-elf-gcc"
     OBJCOPY="riscv-none-elf-objcopy"
@@ -19,13 +18,16 @@ elif command -v riscv64-unknown-elf-gcc &>/dev/null; then
 elif command -v riscv64-elf-gcc &>/dev/null; then
     GCC="riscv64-elf-gcc"
     OBJCOPY="riscv64-elf-objcopy"
+elif command -v riscv32-unknown-elf-gcc &>/dev/null; then
+    GCC="riscv32-unknown-elf-gcc"
+    OBJCOPY="riscv32-unknown-elf-objcopy"
 else
-    echo "ERROR: RISC-V GCC not found. Ensure riscv-none-elf-gcc is in your PATH."
+    echo "ERROR: RISC-V GCC not found. Set RISCV_TC or ensure riscv-none-elf-gcc / riscv64-unknown-elf-gcc is in your PATH."
     exit 1
 fi
 
 echo "========================================="
-echo " Building Dhrystone for Kavacha          "
+echo " Building Dhrystone for MIST-ES          "
 echo "========================================="
 
 cd "$SCRIPT_DIR"
@@ -64,11 +66,11 @@ echo "========================================="
 echo " Running Dhrystone Simulation            "
 echo "========================================="
 
-make -C "$ROOT/bench" run-kavacha-dhrystone HEX_FILE="$SCRIPT_DIR/build/dhrystone.hex" TIMEOUT_CYCLES=300000000
+make -C "$ROOT/bench" run-mist-es-dhrystone HEX_FILE="$SCRIPT_DIR/build/dhrystone.hex" TIMEOUT_CYCLES=300000000
 
 # Fail unless the simulation reached tohost=1 (no FAIL / TIMEOUT).
-grep -aqE '^\[BENCH\] dhrystone .* PASS$' "$ROOT/bench/results/kavacha/dhrystone.log" ||
-  { echo "Dhrystone: FAIL (see bench/results/kavacha/dhrystone.log)"; exit 1; }
+grep -aqE '^\[BENCH\] dhrystone .* PASS$' "$ROOT/bench/results/mist_es/dhrystone.log" ||
+  { echo "Dhrystone: FAIL (see bench/results/mist_es/dhrystone.log)"; exit 1; }
 echo "Dhrystone: PASS"
 
 echo "Done."

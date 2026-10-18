@@ -1,5 +1,5 @@
 // ============================================================================
-// kavacha_debug.sv — RISC-V External Debug (Debug Spec 0.13.2) for Kavacha.
+// mist_es_debug.sv — RISC-V External Debug (Debug Spec 0.13.2) for MIST-ES.
 //
 // Provides a *standard* Debug Transport Module (JTAG DTM) + Debug Module (DM)
 // that OpenOCD + GDB drive out of the box.
@@ -22,8 +22,8 @@
 // ============================================================================
 `default_nettype none
 
-module kavacha_debug #(
-  parameter logic [31:0] IDCODE = 32'h4B41_5641   // "KAVA", bit0=1 per JTAG
+module mist_es_debug #(
+  parameter logic [31:0] IDCODE = 32'h4D49_5355   // "MIST", bit0=1 per JTAG
 )(
   input  wire        clk,
   input  wire        rst,
@@ -34,7 +34,7 @@ module kavacha_debug #(
   input  wire        tdi,
   output reg         tdo,
 
-  // ---- hart control (to/from kavacha_core) ---------------------------------
+  // ---- hart control (to/from mist_es_core) ---------------------------------
   output wire        dbg_haltreq,
   output reg         dbg_resumereq,
   output wire        ndmreset,

@@ -1,8 +1,8 @@
 // ============================================================================
-// tb_kavacha_debug.sv — self-checking JTAG / RISC-V Debug-Module testbench.
+// tb_mist_es_debug.sv — self-checking JTAG / RISC-V Debug-Module testbench.
 //
-//   iverilog -g2012 ... rtl/kavacha_debug.sv ... tb/tb_kavacha_debug.sv
-//   vvp sim/tb_kavacha_debug
+//   iverilog -g2012 ... rtl/mist_es_debug.sv ... tb/tb_mist_es_debug.sv
+//   vvp sim/tb_mist_es_debug
 //
 // Bit-bangs the JTAG TAP exactly as OpenOCD would and exercises the full debug
 // flow against a free-running counter loop in IMEM:
@@ -17,7 +17,7 @@
 // ============================================================================
 `timescale 1ns/1ps
 
-module tb_kavacha_debug;
+module tb_mist_es_debug;
   logic clk = 1'b0; always #5 clk = ~clk;
   logic rst;
   logic tck = 1'b0, tms = 1'b0, tdi = 1'b0, tdo;
@@ -25,7 +25,7 @@ module tb_kavacha_debug;
   logic [31:0] tohost; logic tohost_we;
   logic        rv; logic [31:0] rpc, rins, rval; logic rwe; logic [4:0] rrd;
 
-  kavacha_soc dut (
+  mist_es_soc dut (
     .clk(clk), .rst(rst), .tck(tck), .tms(tms), .tdi(tdi), .tdo(tdo),
     .tohost(tohost), .tohost_we(tohost_we),
     .retire_valid(rv), .retire_pc(rpc), .retire_instr(rins),
@@ -117,7 +117,7 @@ module tb_kavacha_debug;
 
     // (1) IDCODE
     scan_dr(32, 64'd0, cap); idcode = cap[31:0];
-    check("idcode", idcode, 32'h4B41_5641);
+    check("idcode", idcode, 32'h4D49_5355);
 
     // (2) select DMI, activate DM, request halt
     scan_ir(5'h11);

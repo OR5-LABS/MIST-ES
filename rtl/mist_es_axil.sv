@@ -1,19 +1,19 @@
 // ============================================================================
-// kavacha_axil.sv — AXI4-Lite bus integration for Kavacha (standard-bus
+// mist_es_axil.sv — AXI4-Lite bus integration for MIST-ES (standard-bus
 // drop-in). Three modules:
-//   * kavacha_axil_master : wraps kavacha_core, turns its fetch/load/store
+//   * mist_es_axil_master : wraps mist_es_core, turns its fetch/load/store
 //     requests into AXI4-Lite read/write transactions, and drives mem_stall
 //     from the AXI handshake (so the core waits for the bus).
 //   * axil_bram_slave     : an AXI4-Lite slave with unified IMEM/DRAM + tohost.
-//   * kavacha_axil_soc    : connects master <-> slave over real AXI4-Lite wires.
+//   * mist_es_axil_soc    : connects master <-> slave over real AXI4-Lite wires.
 //
 // This lets the core talk a standard bus and drop into any AXI4-Lite fabric.
 // ============================================================================
-`include "kavacha_pkg.sv"
+`include "mist_es_pkg.sv"
 
 // ---------------------------------------------------------------------------
-module kavacha_axil_master
-  import kavacha_pkg::*;
+module mist_es_axil_master
+  import mist_es_pkg::*;
 #( parameter logic [XLEN-1:0] RESET_PC = 32'h0 )
 ( input logic clk, rst,
   // AXI4-Lite master
@@ -29,7 +29,7 @@ module kavacha_axil_master
   logic [3:0]  dmem_be;
   logic        rv, rwe; logic [4:0] rrd; logic [31:0] rpc,rin,rval;
 
-  kavacha_core #(.RESET_PC(RESET_PC)) u_core (
+  mist_es_core #(.RESET_PC(RESET_PC)) u_core (
     .clk(clk), .rst(rst), .imem_addr(imem_addr), .imem_rdata(imem_rdata),
     .dmem_addr(dmem_addr), .dmem_re(dmem_re), .dmem_we(dmem_we), .dmem_be(dmem_be),
     .dmem_wdata(dmem_wdata), .dmem_rdata(dmem_rdata),
@@ -79,7 +79,7 @@ endmodule
 
 // ---------------------------------------------------------------------------
 module axil_bram_slave
-  import kavacha_pkg::*;
+  import mist_es_pkg::*;
 #( parameter int IMEM_WORDS=8192, parameter int DRAM_WORDS=8192,
    parameter logic [31:0] DRAM_BASE=32'h8000_0000, parameter logic [31:0] TOHOST=32'h2000_0000 )
 ( input logic clk, rst,
@@ -134,13 +134,13 @@ module axil_bram_slave
 endmodule
 
 // ---------------------------------------------------------------------------
-module kavacha_axil_soc
-  import kavacha_pkg::*;
+module mist_es_axil_soc
+  import mist_es_pkg::*;
 ( input logic clk, rst, output logic [31:0] tohost, output logic tohost_we );
   logic [31:0] awaddr,wdata,araddr,rdata; logic [3:0] wstrb; logic [1:0] bresp,rresp;
   logic awvalid,awready,wvalid,wready,bvalid,bready,arvalid,arready,rvalid,rready;
 
-  kavacha_axil_master #(.RESET_PC(32'h0)) u_m (.clk(clk),.rst(rst),
+  mist_es_axil_master #(.RESET_PC(32'h0)) u_m (.clk(clk),.rst(rst),
     .awaddr(awaddr),.awvalid(awvalid),.awready(awready),
     .wdata(wdata),.wstrb(wstrb),.wvalid(wvalid),.wready(wready),
     .bresp(bresp),.bvalid(bvalid),.bready(bready),

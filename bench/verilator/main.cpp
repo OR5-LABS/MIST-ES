@@ -1,5 +1,5 @@
 // =============================================================================
-// main.cpp — Verilator C++ harness for Kavacha benchmark suite.
+// main.cpp — Verilator C++ harness for MIST-ES benchmark suite.
 //
 // Usage:
 //   ./sim/Vbench_top --hex <path/to/bench.hex> --name <benchmark_name>

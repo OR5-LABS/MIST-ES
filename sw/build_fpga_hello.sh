@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # build_fpga_hello.sh — assemble the FPGA bring-up demo into firmware.mem
-# ($readmemh, one 32-bit word per line) for kavacha_fpga.
+# ($readmemh, one 32-bit word per line) for mist_es_fpga.
 set -euo pipefail
 cd "$(dirname "$0")"
 

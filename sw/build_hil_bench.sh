@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 # =============================================================================
 # build_hil_bench.sh — Build CoreMark and Dhrystone firmware images for
-#   Hardware-in-the-Loop (HIL) testing on the Kavacha SoC / Arty A7-100T.
+#   Hardware-in-the-Loop (HIL) testing on the MIST-ES SoC / Arty A7-100T.
 #
 # Usage:
-#   cd kavacha/          (repo root)
+#   cd mist-es/          (repo root)
 #   ./sw/build_hil_bench.sh [BENCH]
 #
 #   BENCH (optional):
@@ -30,14 +30,16 @@
 set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
-export PATH="$ROOT/verification/tools/gcc/bin:$PATH"
-
 BENCH_CMD="${1:-all}"
 
 # ---------------------------------------------------------------------------
 # Toolchain detection (same logic as bench/Makefile)
 # ---------------------------------------------------------------------------
-if command -v riscv-none-elf-gcc &>/dev/null; then
+TC="${RISCV_TC:-}"
+if [[ -n "$TC" && -x "$TC/riscv-none-elf-gcc" ]]; then
+    GCC="$TC/riscv-none-elf-gcc"
+    OBJCOPY="$TC/riscv-none-elf-objcopy"
+elif command -v riscv-none-elf-gcc &>/dev/null; then
     GCC="riscv-none-elf-gcc"
     OBJCOPY="riscv-none-elf-objcopy"
 elif command -v riscv64-unknown-elf-gcc &>/dev/null; then
@@ -50,7 +52,7 @@ elif command -v riscv32-unknown-elf-gcc &>/dev/null; then
     GCC="riscv32-unknown-elf-gcc"
     OBJCOPY="riscv32-unknown-elf-objcopy"
 else
-    echo "ERROR: No RISC-V GCC found. Ensure riscv-none-elf-gcc is in your PATH."
+    echo "ERROR: No RISC-V GCC found. Set RISCV_TC or ensure riscv-none-elf-gcc / riscv64-unknown-elf-gcc is in your PATH."
     exit 1
 fi
 
@@ -101,7 +103,7 @@ BASE_LDFLAGS=(
     -Wl,--gc-sections
 )
 
-# Max image size: 128 KB (matches MEM_WORDS=32768 in kavacha_fpga.sv)
+# Max image size: 128 KB (matches MEM_WORDS=32768 in mist_es_fpga.sv)
 MAX_BYTES=$(( 128 * 1024 ))
 
 # ---------------------------------------------------------------------------
@@ -268,10 +270,10 @@ echo "   1. Copy CoreMark image as firmware.mem for Vivado:"
 echo "      cp $OUT_DIR/coremark.mem $ROOT/sw/firmware.mem"
 echo ""
 echo "   2. Build bitstream (from fpga/arty_a7/):"
-echo "      vivado -mode batch -source kavacha_arty_a7.tcl"
+echo "      vivado -mode batch -source mist_es_arty_a7.tcl"
 echo ""
 echo "   3. Flash to Arty A7-100T:"
-echo "      openFPGALoader -b arty_a7_100t $ROOT/fpga/arty_a7/build/kavacha_arty_a7.bit"
+echo "      openFPGALoader -b arty_a7_100t $ROOT/fpga/arty_a7/build/mist_es_arty_a7.bit"
 echo ""
 echo "   4. Capture results (115200 baud):"
 echo "      python3 sw/run_hil_bench.py --port /dev/ttyUSB1 --bench coremark"

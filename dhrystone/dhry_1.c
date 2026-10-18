@@ -280,7 +280,7 @@ main ()
   printf("Number_Of_Runs: %d\n", Number_Of_Runs);
   printf("User_Time: %ld cycles, %ld insn\n", User_Time, User_Insn);
   
-  /* Output for Kavacha HIL parser */
+  /* Output for MIST-ES HIL parser */
   printf("BENCH:dhrystone\n");
   printf("CYCLES:%ld\n", User_Time);
   printf("ITERS:%d\n", Number_Of_Runs);

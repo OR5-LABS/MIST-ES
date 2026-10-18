@@ -1,14 +1,14 @@
 // ============================================================================
-// kavacha_csr.sv — Machine-mode CSR file with trap/MRET support.
+// mist_es_csr.sv — Machine-mode CSR file with trap/MRET support.
 //
 // Single read port (combinational) + single write port (CSR instructions),
 // plus a trap interface used by the EX stage. Implements the minimal M-mode
 // register set needed to take ECALL/EBREAK/illegal traps and return via MRET.
 // ============================================================================
-`include "kavacha_pkg.sv"
+`include "mist_es_pkg.sv"
 
-module kavacha_csr
-  import kavacha_pkg::*;
+module mist_es_csr
+  import mist_es_pkg::*;
 #(
   // misa value advertised by this core. Default RV32IM; each core overrides to
   // reflect its true extensions (C, F, X-vector, ...). base=01 (32-bit) in

@@ -1,10 +1,10 @@
 // ============================================================================
-// kavacha_alu.sv — Combinational RV32I ALU.
+// mist_es_alu.sv — Combinational RV32I ALU.
 // ============================================================================
-`include "kavacha_pkg.sv"
+`include "mist_es_pkg.sv"
 
-module kavacha_alu
-  import kavacha_pkg::*;
+module mist_es_alu
+  import mist_es_pkg::*;
 (
   input  alu_op_e          op,
   input  logic [XLEN-1:0]  a,

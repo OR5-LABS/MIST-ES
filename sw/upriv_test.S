@@ -1,5 +1,5 @@
 // upriv_test.S — User mode must not touch Machine-level CSRs or execute MRET.
-// Runs on Kavacha SECURE. PMP region0 gives U full RWX so only the privilege
+// Runs on MIST-ES SECURE. PMP region0 gives U full RWX so only the privilege
 // checks under test can fault. In U-mode the program attempts:
 //   1. csrr  mstatus       -> illegal instruction (cause 2)
 //   2. csrw  mscratch      -> illegal instruction, mscratch must be unchanged

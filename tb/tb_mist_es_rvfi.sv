@@ -1,11 +1,11 @@
 // ============================================================================
-// tb_kavacha_rvfi.sv — self-checking RVFI (RISC-V Formal Interface) testbench.
+// tb_mist_es_rvfi.sv — self-checking RVFI (RISC-V Formal Interface) testbench.
 //
-//   iverilog -g2012 -DRISCV_FORMAL ... tb/tb_kavacha_rvfi.sv
-//   vvp sim/tb_kavacha_rvfi +IMEM=programs/build/smoke.hex
+//   iverilog -g2012 -DRISCV_FORMAL ... tb/tb_mist_es_rvfi.sv
+//   vvp sim/tb_mist_es_rvfi +IMEM=programs/build/smoke.hex
 //
 // Drives the smoke program and checks the fundamental riscv-formal invariants
-// on kavacha_core's RVFI port, proving the formal interface is wired correctly:
+// on mist_es_core's RVFI port, proving the formal interface is wired correctly:
 //   1. rvfi_order is contiguous (increments by exactly 1 per retire).
 //   2. PC consistency: rvfi_pc_wdata[n] == rvfi_pc_rdata[n+1] (holds across
 //      branches, jumps AND traps — the core riscv-formal liveness property).
@@ -14,7 +14,7 @@
 // ============================================================================
 `timescale 1ns/1ps
 
-module tb_kavacha_rvfi;
+module tb_mist_es_rvfi;
   logic clk = 1'b0;
   always #5 clk = ~clk;
   logic rst;
@@ -26,7 +26,7 @@ module tb_kavacha_rvfi;
   logic        retire_rd_we;
   logic [4:0]  retire_rd;
 
-  kavacha_soc dut (
+  mist_es_soc dut (
     .clk(clk), .rst(rst),
     .tck(1'b0), .tms(1'b0), .tdi(1'b0), .tdo(),
     .tohost(tohost), .tohost_we(tohost_we),

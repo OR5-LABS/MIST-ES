@@ -1,7 +1,7 @@
 /* ============================================================================
  * fpga_bench.ld — Linker script for FPGA hardware-in-the-loop benchmarks.
  *
- * Memory map (matches kavacha_fpga.sv with MEM_WORDS=4096):
+ * Memory map (matches mist_es_fpga.sv with MEM_WORDS=4096):
  *   RAM  0x00000000 – 0x00003FFF  (16 KB, unified code + data + stack)
  *
  * Peripherals (outside RAM, not linked):

@@ -1,5 +1,5 @@
 /* ============================================================================
- * core_portme.h — CoreMark port header for Kavacha bare-metal target.
+ * core_portme.h — CoreMark port header for MIST-ES bare-metal target.
  *
  * CoreMark requires this file to define timing types, iteration counts,
  * memory allocation strategy, and a handful of compile-time switches.

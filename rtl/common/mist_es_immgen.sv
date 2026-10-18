@@ -1,12 +1,12 @@
 // ============================================================================
-// kavacha_immgen.sv — RISC-V immediate generator (shared leaf cell).
+// mist_es_immgen.sv — RISC-V immediate generator (shared leaf cell).
 // Extracts the five immediate formats from a 32-bit instruction. Purely
 // combinational; sign-extension logic lives in exactly one place.
 // ============================================================================
-`include "kavacha_pkg.sv"
+`include "mist_es_pkg.sv"
 
-module kavacha_immgen
-  import kavacha_pkg::*;
+module mist_es_immgen
+  import mist_es_pkg::*;
 (
   input  logic [31:0] instr,
   output logic [XLEN-1:0] imm_i,   // I-type  (loads, OP-IMM, JALR)

@@ -1,12 +1,12 @@
 // ============================================================================
-// kavacha_branch.sv — conditional-branch comparator (shared leaf cell).
+// mist_es_branch.sv — conditional-branch comparator (shared leaf cell).
 // Given a decoded branch op and the two (already-forwarded) operands, decides
 // whether the branch is taken. Purely combinational.
 // ============================================================================
-`include "kavacha_pkg.sv"
+`include "mist_es_pkg.sv"
 
-module kavacha_branch
-  import kavacha_pkg::*;
+module mist_es_branch
+  import mist_es_pkg::*;
 (
   input  br_op_e          br_op,
   input  logic [XLEN-1:0] a,
