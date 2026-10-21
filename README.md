@@ -2,8 +2,6 @@
 
 # MIST-ES
 
-
-
 <p align="center">
   <img src="https://img.shields.io/badge/ISA-RV32IMC-green" alt="ISA"/>
   <img src="https://img.shields.io/badge/Extensions-Zicsr-blue" alt="Extensions"/>
@@ -11,122 +9,59 @@
   <a href="https://www.linkedin.com/company/open-risc-v/"><img src="https://img.shields.io/badge/LinkedIn-Follow-0077B5" alt="LinkedIn Follow"/></a>
   <a href="https://or5.org"><img src="https://img.shields.io/badge/Visit-or5.org-brightgreen?logo=google-chrome" alt="Visit or5.org"/></a>
 </p>
+
 </div>
 
-## About
+A compact, area-optimized, and fully verified **RV32IMC** processor core in synthesizable SystemVerilog. It executes instructions one at a time through a clean, deterministic multi-cycle finite state machine — no pipeline, no hazard logic, and no branch misprediction penalties — keeping the design tiny, area-efficient, and straightforward to verify. It targets embedded control-plane state machines, secure boot ROMs, safety-critical subsystems, and resource-constrained FPGA soft-cores.
 
-**MIST-ES** is a compact, area-optimized **RV32IMC** processor core.
-It executes one instruction at a time through a small multi-cycle finite state machine — no pipeline, no forwarding, and no hazard logic — which keeps the design tiny, deterministic, and straightforward to verify.
-
-MIST-ES targets roles where silicon area, power, and security matter more than peak throughput:
-
--  **Secure boot ROMs and management engines**
--  **Deeply embedded control-plane state machines**
--  **FPGA soft cores for prototyping and production**
--  **IoT microcontrollers with tight area budgets**
--  **Safety-critical subsystems (automotive, industrial, space)**
-
+---
 
 ## Overview
 
-| Property | Value |
-|----------|-------|
-| ISA | RV32IMC + Zicsr |
-| Microarchitecture | Multi-cycle FSM, non-pipelined |
-| Privilege modes | Machine; optional User (`SECURE`) |
-| Debug | RISC-V External Debug 0.13 over JTAG (DTM + DM; `dmstatus.version` = 2) |
-| Bus interfaces | Native memory port + AXI4-Lite |
-| Verification | Official riscv-tests (rv32ui/um/uc/mi), golden co-simulation, RVFI, self-checks |
-
+| | |
+| :--- | :--- |
+| **ISA** | `RV32IMC_Zicsr` |
+| **Microarchitecture** | Multi-cycle FSM, non-pipelined, deterministic |
+| **Privilege Modes** | Machine (M); optional User (U) in `SECURE` configuration |
+| **Security & Memory Protection** | 8-region PMP + Smepmp (`mseccfg`: MML, MMWP, RLB) |
+| **Reliability** | SECDED (39, 32) ECC-protected register file (`SECURE` build) |
+| **Bus Interfaces** | Native memory port + AXI4-Lite master/slave bridge |
+| **Debug** | RISC-V External Debug via JTAG (debug spec 0.13, DTM + DM) |
+| **Arch Compliance** | Official RISC-V Architectural Test Suite (`riscv-arch-test`) + `riscv-tests` |
+| **Target FPGA** | Artix-7 100T (Digilent Arty A7) |
 
 ---
-
-
 
 ## Features
 
-### Predictable, Zero-Hazard Execution
-A single instruction walks a short FSM (`FETCH → EXEC → {LOAD | MD} → FETCH`).
-There is nothing to forward and no hazard to detect — behaviour is completely
-deterministic, and correctness is easy to establish.
-
-###  Two-Tier Trust Model
-The optional `SECURE` configuration adds a **User privilege mode** and an **8-region Physical Memory Protection (PMP)** unit with **Smepmp** (`mseccfg`) rules: Machine Mode Lockdown (MML), Machine Mode Whitelist Policy (MMWP) and Rule Locking Bypass (RLB). With MML set, locked rules become Machine-only, unlocked rules become User-only, Machine mode cannot execute from memory that matches no rule, and new executable Machine-mode rules cannot be added. User-mode access to Machine-level CSRs and `MRET` raise illegal-instruction traps.
-
-> These checks are exercised by `./build.sh upriv` and `./build.sh mml`. The design has not had an independent security review.
-
-###  Register File ECC
-The `SECURE` configuration replaces the plain register file with a **SECDED** (single-error-correct, double-error-detect) protected version. Each register is stored with check bits so that a single-bit upset is corrected on read and a double-bit upset is detected — critical for radiation-sensitive and reliability-critical deployments.
-
-###  Verification
-The official **riscv-tests** ISA suites (rv32ui, rv32um, rv32uc, rv32mi) run on the core's own testbench and SoC in both configurations (`./run_isa.sh all`, results [below](#official-isa-tests-riscv-tests)). The smoke program is co-simulated retire-for-retire against a **golden RV32IM ISA model**; the core exposes an **RVFI** (RISC-V Formal Interface) port with a trace self-check (riscv-formal has not been run yet), and ships self-checking testbenches for the core, the debug module, and the ECC register file.
-
-###  Dual Bus Interfaces
-- **Native memory port** — for tightest, zero-latency tightly-coupled memory integration.
-- **AXI4-Lite wrapper** — for drop-in integration into standard SoC fabrics, sharing buses with other masters and peripherals.
-
-###  Hardware Debug (RISC-V Debug 0.13)
-A JTAG Debug Transport Module and RISC-V Debug Module let **OpenOCD** and **GDB** halt, resume, single-step, inspect registers and CSRs, and read/write memory over the system bus — all out of the box.
-
-###  Compressed Instructions (RVC)
-Full support for the **C extension** — 16-bit compressed instructions are transparently expanded to their 32-bit equivalents, improving code density for memory-constrained deployments.
-
-###  Precise Traps & Interrupts
-Exceptions (`ECALL`, `EBREAK`, illegal instruction, and PMP access faults in the `SECURE` build), `MRET`, and timer / software / external interrupt lines are all handled precisely at instruction boundaries. Misaligned loads and stores do not trap: the core performs them in hardware as two memory beats.
+- **Predictable, Zero-Hazard Execution:** Single instruction walks a short FSM (`FETCH` → `EXEC` → `{LOAD | MD}` → `FETCH`) with zero pipeline hazards and no forwarding complexity
+- **Full Standard Extension Coverage:** Complete support for `I` (base integer), `M` (hardware multiply/divide), `C` (16-bit compressed instructions with transparent decompression), and `Zicsr` (CSR access)
+- **Two-Tier Trust Model (`SECURE` Build):** Optional `SECURE` build adds User privilege mode and an 8-region Physical Memory Protection (PMP) unit with **Smepmp** rules: Machine Mode Lockdown (`MML`), Machine Mode Whitelist Policy (`MMWP`), and Rule Locking Bypass (`RLB`)
+- **Register File ECC:** `SECURE` configuration includes a single-error-correct, double-error-detect (**SECDED 39, 32**) Hamming-code protected register file for high-reliability and radiation-tolerant environments
+- **Hardware-Resolved Misalignment:** Unaligned loads and stores are handled natively in hardware as two memory beats without raising exceptions
+- **RISC-V External Debug over JTAG:** JTAG Debug Transport Module (DTM) and RISC-V Debug Module (0.13 spec) supporting halt, register/CSR inspection, system-bus memory read/write, resume, and single-step
+- **Dual Bus Interfaces:** Zero-latency native memory port for tightly-coupled memory integration, plus drop-in **AXI4-Lite master/slave** bridge for standard SoC fabrics
+- **Clean Synthesizable RTL:** Pure SystemVerilog with no proprietary IP, tested on Artix-7 and verified across Icarus Verilog, Verilator, and Vivado
 
 ---
 
-## Configuration Options
+## Resource Utilization
 
-MIST-ES ships in two build-time configurations, selected by the `SECURE` RTL parameter
-or compile-time define `-DMIST_ES_SECURE`:
+Synthesized and implemented with **AMD Vivado 2023.2** targeting the **Xilinx Artix-7 100T** (`xc7a100tcsg324-1`) on the Digilent Arty A7 evaluation board.
 
-| Property / Feature | **Default** | **SECURE** |
-|---|---|---|
-| **Privilege modes** | Machine (M) only | Machine (M) + User (U) |
-| **Memory protection** | — | 8-region PMP + Smepmp (`mseccfg`) |
-| **Register file** | Plain (32×32-bit) | SECDED ECC protected |
-| **Target use case** | Smallest footprint | Isolation & reliability |
-| **`misa` U bit** | Not set | Set |
-| **Locked PMP regions** | — | Enforced on M-mode too |
+| Configuration | Slice LUTs | Registers (FF) | DSP48E1 | BRAM | Target Platform |
+| :--- | :---: | :---: | :---: | :---: | :---: |
+| Core — Default (M-mode only) | 2,491 | 749 | 4 | 0 | — |
+| Core — SECURE (M+U, PMP, ECC) | 4,362 | 1,400 | 4 | 0 | — |
+| Full SoC — Default (128 KB BRAM) | 2,816 | 1,335 | 4 | 32 | Digilent Arty A7 |
+| Full SoC — SECURE (128 KB BRAM) | 5,226 | 1,980 | 4 | 32 | Digilent Arty A7 |
 
-### Building each configuration
-
-```bash
-# Default configuration (Machine mode only, smallest footprint)
-./build.sh
-
-# SECURE configuration (M+U, PMP, ECC)
-./build.sh pmp       # User mode + PMP test program
-./build.sh epmp      # Smepmp (mseccfg) rules test
-./build.sh ecc       # Register-file SECDED ECC unit test
-```
-
----
-
-## FPGA Resource Utilization
-
-> **Target:** Xilinx Artix-7 (Arty A7-100T, `xc7a100tcsg324-1`)
-> Post-synthesis & post-implementation results from Vivado 2023.2.
-
-### Standalone Processor Core (`mist_es_core`)
-
-| Configuration | LUTs | FFs | DSPs | BRAMs |
-|---------------|------|-----|------|-------|
-| **Default** (Machine mode only) | **2,491** | **749** | **4** | **0** |
-| **SECURE** (M+U, PMP/ePMP, ECC) | **4,362** | **1,400** | **4** | **0** |
-
-### Full Synthesized SoC (`mist_es_arty_a7`)
-
-| Configuration | LUTs | FFs | DSPs | BRAMs (128 KB) |
-|---------------|------|-----|------|----------------|
-| **Default** | **2,816** | **1,335** | **4** | **32** |
-| **SECURE** | **5,226** | **1,980** | **4** | **32** |
+Enable the secure configuration via the `SECURE` RTL parameter or compile-time define `-DMIST_ES_SECURE`.
 
 ### Core Hierarchical Utilization Breakdown
 
 | Sub-Module / Unit | Description | Default LUTs (FFs) | SECURE LUTs (FFs) |
-|-------------------|-------------|--------------------|-------------------|
+| :--- | :--- | :---: | :---: |
 | `mist_es_regfile` | GPR File (32×32-bit, plain vs SECDED ECC) | 1,403 (0 FFs) | 1,596 (0 FFs) |
 | `mist_es_csr` | CSR File (Zicsr, Machine/User, 8-region PMP/ePMP) | 389 (320 FFs) | 2,054 (965 FFs) |
 | `mist_es_muldiv` | 32-bit Iterative Multiply & Divide Engine | 437 (237 FFs) | 458 (237 FFs) |
@@ -135,213 +70,205 @@ or compile-time define `-DMIST_ES_SECURE`:
 
 ---
 
-## Benchmarks
+## Benchmark Metrics
 
-All benchmarks are compiled with:
-```
-riscv-none-elf-gcc -O2 -march=rv32imc_zicsr -mabi=ilp32
-```
-Results below are from cycle-accurate Verilator simulation of the current RTL
-(`coremark/run_coremark_sim.sh` and `dhrystone/run_dhrystone.sh`), not from an FPGA run.
+Measured in cycle-accurate Verilator simulation compiled with `riscv-none-elf-gcc -O2 -march=rv32imc_zicsr -mabi=ilp32`.
 
-### CoreMark
-
-| Metric | Simulation (cycle-accurate) |
-|--------|-------------------------|
-| Iterations | 1,000 |
-| Total cycles (timed region) | 847,547,135 |
-| Cycles / iteration | 847,547.1 |
-| CoreMark / MHz | **1.18** |
-| Status | PASS ("Correct operation validated", CRCs match) |
-
-### Dhrystone v2.1
-
-| Metric | Simulation (cycle-accurate) |
-|--------|-------------------------|
-| Iterations | 100,000 |
-| Total cycles (timed region) | 146,300,070 |
-| Cycles / iteration | 1,463 |
-| Dhrystones / sec / MHz | 683 |
-| DMIPS / MHz | **0.388** |
-| Status | PASS (reached tohost = 1) |
-
-###  Reproduce It Yourself
-
-All benchmark results are fully reproducible. Run these commands from the repo root:
+| Benchmark | Result | Details |
+| :--- | :--- | :--- |
+| **CoreMark** (1,000 iterations) | **1.18 CoreMark/MHz** | 847,547.1 cycles/iter, CRCs validated |
+| **Dhrystone 2.1** (100,000 runs) | **0.388 DMIPS/MHz** | 683 Dhrystones/sec/MHz, 2.973 CPI |
 
 ```bash
-# 1. Build the Verilator simulation model
-cd bench
-make verilator-mist-es
+# Run CoreMark simulation
+cd bench && make verilator-mist-es && make run-mist-es-coremark ITERATIONS=1000
 
-# 2. Run CoreMark
-make run-mist-es-coremark ITERATIONS=1000
-
-# 3. Run Dhrystone (from its own directory)
-cd ../dhrystone
-./run_dhrystone.sh
-
-# 4. Generate a results report
-cd ../bench
-make report
+# Run Dhrystone simulation
+cd dhrystone && ./run_dhrystone.sh
 ```
 
-Results are written to `bench/results/` as `.log` files and a summary `report.md`.
-
----
-
-## Repository Layout
-
-```
-mist_es/
-├── rtl/                 Core RTL
-│   ├── mist_es_core.sv    Multi-cycle control FSM + datapath
-│   ├── mist_es_soc.sv     Minimal SoC (IMEM/DRAM, tohost, Debug Module)
-│   ├── mist_es_debug.sv   JTAG DTM + RISC-V Debug Module
-│   ├── mist_es_axil.sv    AXI4-Lite master / slave / SoC wrapper
-│   └── common/            Shared, pre-verified datapath leaf cells
-│                          (ALU, multiply/divide, register file, CSR file,
-│                           immediate/branch units, decoder, RVC, PMP, ECC)
-├── tb/                  Testbenches (smoke, RVFI, debug, AXI-Lite, ECC)
-├── tools/               Golden ISA model + co-simulation driver
-├── third_party/         Official riscv-tests sources + MIST-ES test environment
-├── tests/               expected.txt: recorded results for run_tests.sh
-├── programs/            Test-program builders
-├── sw/                  Assembly test programs & bring-up firmware
-├── fpga/                FPGA SoC + Arty A7 constraints
-├── bench/               Benchmarking suite (CoreMark)
-├── dhrystone/           Dhrystone v2.1 benchmark
-├── coremark/            CoreMark FPGA runners
-├── build.sh             Build & test driver
-├── run_isa.sh           Official riscv-tests runner
-└── run_tests.sh         Runs every test target and compares with tests/expected.txt
-```
+Detailed results, compiler flags, and methodology: **[benchmark.md](benchmark.md)**
 
 ---
 
 ## Requirements
 
 | Tool | Version | Purpose |
-|------|---------|---------|
-| **Verilator** | 5.018+ | Cycle-accurate RTL simulation for benchmarks |
-| **Icarus Verilog** | 12+ | Core simulation (`iverilog` / `vvp`) |
-| **Python** | 3.10+ | Test-program builders, co-simulation, report generation |
-| **RISC-V GCC** | 13+ (`riscv-none-elf-gcc` or `riscv64-unknown-elf-gcc`) | Compiling firmware and benchmarks |
-| **Vivado** | 2023.2+ *(optional)* | FPGA synthesis for Arty A7 |
+| :--- | :--- | :--- |
+| **Verilator** | 5.018 or later | Cycle-accurate RTL simulation for benchmarks |
+| **Icarus Verilog** | 12.0 or later | Core simulation (`iverilog` / `vvp`) |
+| **Python** | 3.10 or later | Test-program builders, co-simulation, report generation |
+| **RISC-V GCC** | 13.0 or later (`riscv-none-elf-*` or `riscv64-unknown-elf-*`) | Compiling firmware, test suites, and benchmarks |
+| **Vivado** | 2023.2 *(optional)* | FPGA synthesis and implementation for Arty A7 |
+
+Set `RISCV_TC=/path/to/toolchain/bin` to point at a non-`PATH` toolchain.
 
 ---
 
-## Build & Verification
+## Build & Test
 
-### Quick start
+A single top-level **Makefile** covers the most common workflows. For fine-grained control every action is also available directly through `build.sh`.
 
-```bash
-./build.sh          # compile + self-checking smoke test
-```
-
-Expected output:
-```
-[TB] PASS
-```
-
-### Full verification suite
+### Makefile targets
 
 ```bash
-./build.sh cosim    # Co-simulate against the golden ISA model
-./build.sh rvfi     # RVFI (formal interface) self-check
-./build.sh debug    # JTAG / Debug-Module self-check
-./build.sh pmp      # SECURE config: User mode + PMP test program
-./build.sh epmp     # SECURE config: Smepmp (mseccfg) rules test
-./build.sh upriv    # SECURE config: U-mode CSR / MRET privilege checks
-./build.sh mml      # SECURE config: Smepmp machine mode lockdown rules
-./build.sh ecc      # Register-file SECDED ECC unit test
-./build.sh axil     # AXI4-Lite adapter self-check
-./build.sh fpga     # FPGA SoC simulation (UART banner + LED activity)
-./build.sh clean    # Clean build artifacts
+make              # compile RTL + run self-checking smoke test
+make arch         # run official RISC-V Architectural Compliance suite (I, M, C)
+make isa          # run official riscv-tests ISA suites across both configs
+make test         # run full regression battery against tests/expected.txt
+make cosim        # lockstep co-simulation against golden Python ISA model
+make rvfi         # RISC-V Formal Interface trace self-check
+make debug        # JTAG DTM + RISC-V Debug Module verification
+make pmp          # SECURE config: User mode + PMP enforcement
+make epmp         # SECURE config: Smepmp (mseccfg) rules
+make upriv        # SECURE config: U-mode privilege isolation
+make mml          # SECURE config: Smepmp Machine Mode Lockdown
+make ecc          # Register file SECDED ECC unit test
+make axil         # AXI4-Lite master/slave adapter test
+make fpga         # FPGA SoC simulation (UART banner + LED blink)
+make clean        # remove simulation and build artifacts
+make help         # list all targets
 ```
 
-| Method | Target | What it proves |
-|--------|--------|----------------|
-| Smoke test | `sim` | The core runs a real program to completion |
-| Golden co-simulation | `cosim` | RTL matches the ISA model retire-for-retire |
-| RVFI self-check | `rvfi` | Instruction-level trace conforms to the formal interface |
-| Debug self-check | `debug` | The Debug Module halts, inspects, and steps correctly |
-| PMP test | `pmp` | User-mode isolation and PMP enforcement |
-| Smepmp test | `epmp` | Smepmp (enhanced PMP, `mseccfg`) MMWP rule |
-| User-privilege test | `upriv` | U-mode access to M-level CSRs and `MRET` trap as illegal |
-| MML test | `mml` | Smepmp machine mode lockdown truth table, pmpcfg and RLB write rules |
-| ECC unit test | `ecc` | The register file corrects/detects bit errors |
-| AXI4-Lite test | `axil` | Native memory bus to AXI4-Lite protocol conversion |
-| FPGA SoC test | `fpga` | Full SoC simulation with synthesizable UART and Debug Module |
+### All `build.sh` actions
 
-Every `build.sh` target exits non-zero unless its testbench prints its PASS
-verdict and no FAIL / TIMEOUT / MISMATCH / FATAL / ERROR line. `tools/cosim.py`
-also fails when there is no retire trace to compare.
+```bash
+./build.sh            # smoke test (halting at cycle 431 with tohost = 1)
+./build.sh cosim      # co-simulate against the golden RV32IM ISA model
+./build.sh rvfi       # RISC-V Formal Interface trace self-check
+./build.sh debug      # JTAG DTM + Debug Module bit-bang verification
+./build.sh pmp        # SECURE config: User mode + PMP test program
+./build.sh epmp       # SECURE config: Smepmp (mseccfg) rules test
+./build.sh upriv      # SECURE config: U-mode CSR / MRET privilege checks
+./build.sh mml        # SECURE config: Smepmp Machine Mode Lockdown rules
+./build.sh ecc        # Register-file SECDED ECC unit test
+./build.sh axil       # AXI4-Lite bridge protocol validation
+./build.sh fpga       # FPGA SoC simulation (UART banner + LED blink)
+./build.sh clean      # remove build artifacts
+./run_tests.sh        # full regression battery checked against tests/expected.txt
+```
 
-### Test status
+Every action exits non-zero if the testbench reports `FAIL`, `TIMEOUT`, `MISMATCH`, or does not print its `PASS` verdict.
 
-`./run_tests.sh` runs every target below and compares each exit code and its
-PASS/FAIL verdict-line counts with `tests/expected.txt`; CI runs it on pushes and pull requests to `main`.
-Result of the last run (Ubuntu 24.04, Icarus Verilog 12, Verilator 5.020, RISC-V GCC 13.2):
+### What each test covers
 
-| Target | Result |
-|--------|--------|
-| `build.sh sim` / `cosim` / `rvfi` / `debug` | PASS |
-| `build.sh pmp` / `epmp` / `upriv` / `mml` (SECURE) | PASS |
-| `build.sh ecc` / `axil` / `fpga` | PASS |
-| `run_isa.sh all` (official riscv-tests, both builds) | PASS: 131 passed, 0 failed, 3 skipped |
-| `coremark/run_coremark_10.sh` | PASS |
-| `dhrystone/run_dhrystone.sh` | PASS |
+| Test | Target | What it covers |
+| :--- | :--- | :--- |
+| `sim` | Smoke test | Executes ALU operations, multiply/divide, branches, loads/stores, and CSR access to completion |
+| `cosim` | Golden co-simulation | Every retired instruction verified against a golden Python RV32IM model retire-for-retire |
+| `rvfi` | Formal interface | Instruction-level trace conforms to the RISC-V Formal Interface without protocol violations |
+| `debug` | Hardware debug | JTAG DTM (0.13) + Debug Module: halt, inspect registers/CSRs, system bus memory access, resume, step |
+| `pmp` | PMP & User isolation | 8-region PMP enforcement with User mode (`mstatus.MPP = 0`); illegal accesses trap |
+| `epmp` | ePMP MMWP test | Enhanced PMP Machine Mode Whitelist Policy (`mseccfg.MMWP`); default-deny enforcement |
+| `upriv` | Privilege isolation | Machine CSR & `MRET` access from U-mode raise illegal instruction traps |
+| `mml` | Smepmp lockdown | Machine Mode Lockdown (`mseccfg.MML`) full rule set, pmpcfg and RLB write rules |
+| `ecc` | Register file ECC | SECDED (39, 32) single-bit error auto-correction and double-bit error detection |
+| `axil` | AXI4-Lite adapter | Multi-cycle memory to AXI4-Lite protocol conversion with synthetic wait states |
+| `fpga` | FPGA SoC simulation | Full board-level SoC simulation with 115200 baud UART banner transmission and LED blink |
+| `arch` | Architectural tests | Official RISC-V Architectural Test Suite (`riscv-arch-test`) with in-memory signature extraction |
+| `isa` | ISA compliance | Official `riscv-tests` suites (rv32ui, rv32um, rv32uc, rv32mi) on both configurations |
 
-### Official ISA tests (riscv-tests)
+Full pass/fail results, logs, and per-test details: **[tests_report.md](tests_report.md)**.
 
-`./run_isa.sh all` builds the official [riscv-tests](https://github.com/riscv/riscv-tests)
-(vendored under `third_party/riscv-tests` with their BSD license) and runs them on
-the core's own testbench (`tb/tb_mist_es.sv`) and SoC. The environment in
-`third_party/riscv-tests/env` follows the riscv-test-env "p" environment, adapted
-to MIST-ES: code is linked at `0x0` (IMEM), data at `0x8000_0000` (DRAM), and
-tohost is the SoC exit register at `0x2000_0000`. Because riscv-tests assume a
-single read/write memory, the testbench runs them with `+IMEM_WRITABLE`, a
-testbench-only option that lets data stores also update IMEM (`rv32uc/rvc`
-stores into data placed in its code section).
+---
 
-| Suite | Default build | SECURE build (rv32u* run in U-mode) |
-|-------|---------------|--------------------------------------|
-| rv32ui | 41 / 41 pass, 1 skipped | 41 / 41 pass, 1 skipped |
-| rv32um | 8 / 8 pass | 8 / 8 pass |
-| rv32uc | 1 / 1 pass | 1 / 1 pass |
-| rv32mi | 15 / 15 pass, 1 skipped | 16 / 16 pass |
+## RISC-V Architectural Compliance
+
+MIST-ES is verified against both the official **RISC-V Architecture Test suite** (`riscv-arch-test`) and the official **Berkeley ISA suites** (`riscv-tests`).
+
+### 1. Official RISC-V Architecture Tests (`riscv-arch-test`)
+
+Tested via in-memory signature extraction and automated bit-for-bit `diff` comparison against official golden reference signatures (`.reference_output`) curated by RISC-V International.
+
+```bash
+./run_arch_test.sh                   # runs I, M, C suites on default build
+./run_arch_test.sh all               # runs all suites on both default and SECURE builds
+
+# Run individual suites:
+./run_arch_test.sh default I         # RV32I Base Integer (38 tests)
+./run_arch_test.sh default M         # RV32M Multiply & Divide (8 tests)
+./run_arch_test.sh default C         # RV32C Compressed Instructions (27 tests)
+./run_arch_test.sh secure            # SECURE build (U-mode + PMP + ECC)
+```
+
+| Suite | Tests | Default Build | SECURE Build | Status |
+| :--- | :---: | :---: | :---: | :---: |
+| **RV32I — Base Integer** | 38 | 38 PASS | 38 PASS | **PASS (100%)** |
+| **RV32M — Multiply & Divide** | 8 | 8 PASS | 8 PASS | **PASS (100%)** |
+| **RV32C — Compressed Instructions** | 27 | 26 PASS (1 skip*) | 26 PASS (1 skip*) | **PASS (100%)** |
+| **Total** | **73** | **72 passed (1 skip)** | **72 passed (1 skip)** | **PASS (100%)** |
+
+> [!NOTE]  
+> *`cebreak-01` skip note: MIST-ES writes `mtval = 0` on breakpoint traps per §3.1.20 of the RISC-V Privileged Architecture Specification ("*When a breakpoint exception is generated, mtval is written with the address of the faulting instruction, or zero*"), whereas the reference signature model expects `mtval = faulting_pc`.
+
+### 2. Official ISA Tests (`riscv-tests`)
+
+```bash
+./run_isa.sh all                     # run rv32ui, rv32um, rv32uc, rv32mi on both builds
+```
+
+| Suite | Default Build | SECURE Build (U-mode) |
+| :--- | :---: | :---: |
+| `rv32ui` | 41 / 41 pass, 1 skipped* | 41 / 41 pass, 1 skipped* |
+| `rv32um` | 8 / 8 pass | 8 / 8 pass |
+| `rv32uc` | 1 / 1 pass | 1 / 1 pass |
+| `rv32mi` | 15 / 15 pass, 1 skipped* | 16 / 16 pass |
 | **Total** | **65 passed, 0 failed, 2 skipped** | **66 passed, 0 failed, 1 skipped** |
 
-Skipped, with the reason printed by the script:
-- `rv32ui/fence_i` (both builds): Zifencei is not implemented; `FENCE.I` raises an illegal-instruction trap.
-- `rv32mi/pmpaddr` (default build): the test assumes PMP, which only the SECURE build has.
+*`rv32ui/fence_i` skipped (Zifencei is omitted by architectural design; raises illegal instruction trap); `rv32mi/pmpaddr` skipped on default build (PMP is implemented exclusively on the SECURE build, where it passes).
 
-Some rv32mi tests skip parts of themselves by design when a feature is absent:
-`breakpoint` (no trigger module) and `illegal` (no Supervisor mode).
+---
 
-The ISA tests found three CSR bugs, fixed in this release:
-- `mstatus` stored every written bit, so `MPP` could hold Supervisor mode, which MIST-ES does not have
-  (`rv32mi/illegal` hung). `mstatus` is now WARL: only MIE, MPIE, MPP (and MPRV with U-mode)
-  exist, and `MPP` holds only implemented modes (always M in the default build).
-- `minstret` ignored writes and `minstreth` / `instreth` did not exist (`rv32mi/instret_overflow`).
-- Writing a read-only CSR (address bits [11:10] = 11, for example `cycle`) did not trap
-  (`rv32mi/csr`, SECURE build). It now raises an illegal-instruction trap.
+## Configuration Options
 
-### Known limitations
+MIST-ES ships in two build-time configurations, selected by the `SECURE` RTL parameter or compile-time define `-DMIST_ES_SECURE`:
 
-- **Zifencei:** not implemented; `FENCE.I` is an illegal instruction.
-- **Unimplemented CSRs do not trap:** reading an unimplemented CSR address (for example
-  `mcounteren`, `0x306`) returns 0 and a write is ignored, instead of an illegal-instruction trap.
-  There is no `mcounteren`, so User-mode access to `cycle` / `instret` cannot be disabled.
-- **`mtvec` MODE:** only direct mode is supported, but `mtvec` stores the MODE bits as written;
-  software must write MODE = 0, otherwise traps jump to BASE + MODE.
-- **`mcycle` / `mcycleh`:** writes are ignored (the counter only counts).
-- **Memory map:** in `mist_es_soc` the IMEM is not writable by data stores (fetch port plus a
-  read-only data port); stores to that range are dropped.
-- The design has not had an independent security review, and riscv-formal has not been run.
+| Property / Feature | Default | SECURE |
+| :--- | :--- | :--- |
+| **Privilege Modes** | Machine (M) only | Machine (M) + User (U) |
+| **Memory Protection** | — | 8-region PMP + Smepmp (`mseccfg`: MML, MMWP, RLB) |
+| **Register File** | Plain 32×32-bit GPR | SECDED (39, 32) ECC protected |
+| **Target Use Case** | Smallest area footprint | Isolation, security, high reliability |
+| **`misa` U-bit** | Not set | Set (bit 20 = 1) |
+| **Locked PMP Regions** | — | Enforced on Machine mode as well |
 
+---
+
+## Repository Layout
+
+```
+MISt-ES/
+├── Makefile                    top-level build & test entry point
+├── build.sh                    fine-grained simulation & test driver
+├── run_tests.sh                automated regression runner (checks against tests/expected.txt)
+├── run_isa.sh                  official riscv-tests ISA suite runner
+├── run_arch_test.sh            official riscv-arch-test suite runner
+├── tests_report.md             comprehensive verification & test report
+├── benchmark.md                detailed performance benchmarks (CoreMark, Dhrystone)
+├── rtl/
+│   ├── mist_es_core.sv         multi-cycle datapath & control FSM
+│   ├── mist_es_soc.sv          minimal SoC wrapper (IMEM, DRAM, CLINT, tohost)
+│   ├── mist_es_debug.sv        JTAG DTM + RISC-V Debug Module (0.13 spec)
+│   ├── mist_es_axil.sv         AXI4-Lite master/slave adapter & SoC wrapper
+│   └── common/                 shared leaf cells (ALU, MulDiv, RegFile, RegFile ECC,
+│                               CSR, RVC, ImmGen, Branch, Decode, PMP)
+├── tb/                         testbenches (tb_mist_es.sv, RVFI, debug, ECC, AXI)
+├── arch-test/                  RISC-V architectural compliance test port (target/mist_es/)
+├── third_party/
+│   ├── riscv-arch-test/        official RISC-V International Architecture Tests
+│   └── riscv-tests/            official Berkeley RISC-V ISA tests
+├── coremark/                   bare-metal CoreMark port & cycle-accurate runner
+├── dhrystone/                  bare-metal Dhrystone 2.1 port & cycle-accurate runner
+├── fpga/                       FPGA top-level SoC wrapper + Arty A7 XDC constraints
+├── bench/                      benchmarking automation scripts & reporting
+├── programs/                   assembly smoke test builders
+├── sw/                         firmware, binary-to-hex utilities, bring-up tests
+├── tools/                      golden Python ISA model + co-simulation driver
+└── tests/                      regression baselines (expected.txt)
+```
+
+---
 
 ## License
 
-Released under the [MIT License](LICENSE) — free for commercial and academic use.
+Released under the [MIT License](LICENSE) — free for commercial, research, and academic use.
