@@ -12,7 +12,9 @@
 
 </div>
 
-A compact, area-optimized, and fully verified **RV32IMC** processor core in synthesizable SystemVerilog. It executes instructions one at a time through a clean, deterministic multi-cycle finite state machine — no pipeline, no hazard logic, and no branch misprediction penalties — keeping the design tiny, area-efficient, and straightforward to verify. It targets embedded control-plane state machines, secure boot ROMs, safety-critical subsystems, and resource-constrained FPGA soft-cores.
+A compact, fully verified **RV32IMC** processor core in synthesizable SystemVerilog. Built around a deterministic multi-cycle state machine with zero pipeline or hazard overhead, it targets embedded control planes, secure boot ROMs, safety-critical subsystems, and resource-constrained FPGA soft-cores.
+
+![diagram](diagram.svg)
 
 ---
 
