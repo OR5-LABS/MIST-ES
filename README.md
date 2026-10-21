@@ -114,18 +114,9 @@ A single top-level **Makefile** covers the most common workflows. For fine-grain
 ```bash
 make              # compile RTL + run self-checking smoke test
 make arch         # run official RISC-V Architectural Compliance suite (I, M, C)
-make isa          # run official riscv-tests ISA suites across both configs
-make test         # run full regression battery against tests/expected.txt
-make cosim        # lockstep co-simulation against golden Python ISA model
-make rvfi         # RISC-V Formal Interface trace self-check
 make debug        # JTAG DTM + RISC-V Debug Module verification
 make pmp          # SECURE config: User mode + PMP enforcement
-make epmp         # SECURE config: Smepmp (mseccfg) rules
-make upriv        # SECURE config: U-mode privilege isolation
 make mml          # SECURE config: Smepmp Machine Mode Lockdown
-make ecc          # Register file SECDED ECC unit test
-make axil         # AXI4-Lite master/slave adapter test
-make fpga         # FPGA SoC simulation (UART banner + LED blink)
 make clean        # remove simulation and build artifacts
 make help         # list all targets
 ```
