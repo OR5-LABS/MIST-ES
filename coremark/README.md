@@ -1,6 +1,6 @@
 # CoreMark Evaluation Suite for MIST-ES
 
-This document details the toolchain, compiler options, execution parameters, score calculations, and hardware benchmark results for the **MIST-ES** RISC-V (RV32IMC) processor core running **EEMBC CoreMark**.
+This document details the toolchain, compiler options, execution parameters, score calculations, and benchmark results for the **MIST-ES** RISC-V (RV32IMC) processor core running **EEMBC CoreMark**.
 
 ---
 
@@ -49,7 +49,6 @@ CoreMark is built using the project's bundled GNU RISC-V toolchain with strict b
 ```bash
 -T bench/common/bench.ld -Wl,--gc-sections -Wl,-Map=coremark.map
 ```
-*(For FPGA Hardware-in-the-Loop, `sw/fpga_bench.ld` and `sw/crt0_fpga.S` are used).*
 
 ---
 
@@ -58,9 +57,9 @@ CoreMark is built using the project's bundled GNU RISC-V toolchain with strict b
 All CoreMark performance runs execute 1,000 iterations (the EEMBC minimum required workload for valid scoring).
 
 | Environment | Target | Iterations | Total Ticks (Cycles) | Cycles / Iteration | CoreMark / MHz | Status |
-|-------------|--------|------------|----------------------|--------------------|----------------|--------|
-
-| **FPGA HIL** | Arty A7-100T @ 50 MHz | 1,000 | **1,234,774,918** | **1,234,774.9** | **0.8100** | ✅ PASS |
+|-------------|--------|:----------:|:--------------------:|:------------------:|:--------------:|:------:|
+| **Verilator Simulation** | Cycle-Accurate Model | 1,000 | **847,547,135** | **847,547.1** | **1.18** | PASS |
+| **Verilator Simulation** | Quick Verification | 10 | **8,475,505** | **847,550.5** | **1.18** | PASS |
 
 ---
 
@@ -74,10 +73,10 @@ CoreMark scores measure normalized throughput per MHz ($\text{CoreMark/MHz}$).
 2. **CoreMark / MHz**:
    $$\text{CoreMark / MHz} = \frac{1,000,000}{\text{Cycles / Iteration}}$$
 
-### Sample Calculation (FPGA HIL):
-$$\text{Cycles / Iteration} = \frac{1,234,774,918}{1,000} = 1,234,774.918$$
+### Sample Calculation (1,000 Iterations):
+$$\text{Cycles / Iteration} = \frac{847,547,135}{1,000} = 847,547.135$$
 
-$$\text{CoreMark / MHz} = \frac{1,000,000}{1,234,774.918} = 0.8100 \text{ CoreMark/MHz}$$
+$$\text{CoreMark / MHz} = \frac{1,000,000}{847,547.135} = 1.1799 \approx \mathbf{1.18 \text{ CoreMark/MHz}}$$
 
 *Note: Benchmark loop ticks are captured directly via RISC-V 64-bit `mcycle` CSR reads around `ee_main()`, excluding boot initialization (`crt0.S`) and stack setup.*
 
@@ -93,12 +92,8 @@ The `coremark/` directory provides shell drivers for running and reproducing Cor
 - **`./run_coremark_10.sh`**:
   Sanity check driver running 10 iterations (~2 to 5 seconds) for quick verification of RTL or toolchain changes.
 
-- **`./run_coremark_fpga.sh`**:
-  Builds bare-metal FPGA HIL firmware, generates `$readmemh` `firmware.mem`, and launches Vivado batch synthesis & bitstream generation for Digilent Arty A7-100T.
+---
 
-## Execution Screenshots
+## Execution Screenshot
 
-
-### FPGA HIL
-
-![CoreMark FPGA HIL Output](cm_fpga.png)
+![CoreMark Simulation Output](coremark_sim.png)
