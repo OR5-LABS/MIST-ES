@@ -70,7 +70,6 @@ bench/.venv/
 bench/venv/
 
 # Verification toolchains and tools
-verification/tools/
 
 # dhrystone build
 dhrystone/build/
@@ -83,3 +82,4 @@ benchmarks/coremark_sim.log
 
 # test runner outputs (run_tests.sh, run_isa.sh)
 /build/
+third_party/riscv-arch-test/
