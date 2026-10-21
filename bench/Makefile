@@ -37,6 +37,7 @@ CXX       ?= g++
 ifeq ($(RISCV_GCC),)
   RISCV_GCC := $(firstword \
     $(wildcard $(RISCV_TC)/riscv-none-elf-gcc) \
+    $(wildcard /opt/riscv/bin/riscv-none-elf-gcc) \
     $(shell command -v riscv-none-elf-gcc      2>/dev/null) \
     $(shell command -v riscv64-unknown-elf-gcc 2>/dev/null) \
     $(shell command -v riscv32-unknown-elf-gcc 2>/dev/null) \

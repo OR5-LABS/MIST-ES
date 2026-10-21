@@ -64,7 +64,7 @@ fi
 
 # ---- SECURE config: U-mode + PMP / ePMP -----------------------------------
 if [[ "$ACTION" == "pmp" || "$ACTION" == "epmp" || "$ACTION" == "upriv" || "$ACTION" == "mml" ]]; then
-  TC="${RISCV_TC:-}"
+  TC="${RISCV_TC:-/opt/riscv/bin}"
   GCC=""
   OBJCOPY=""
   if [[ -n "$TC" && -x "$TC/riscv-none-elf-gcc" ]]; then

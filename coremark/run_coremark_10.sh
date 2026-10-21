@@ -6,7 +6,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" &> /dev/null && pwd)"
 MIST_ES_DIR="$(dirname "$SCRIPT_DIR")"
 
 # Detect RISC-V GCC
-TC="${RISCV_TC:-}"
+TC="${RISCV_TC:-/opt/riscv/bin}"
 if [[ -n "$TC" && -x "$TC/riscv-none-elf-gcc" ]]; then
     RISCV_GCC="$TC/riscv-none-elf-gcc"
 elif command -v riscv-none-elf-gcc &>/dev/null; then

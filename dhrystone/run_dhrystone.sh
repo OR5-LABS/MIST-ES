@@ -5,7 +5,7 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 # Detect RISC-V GCC
-TC="${RISCV_TC:-}"
+TC="${RISCV_TC:-/opt/riscv/bin}"
 if [[ -n "$TC" && -x "$TC/riscv-none-elf-gcc" ]]; then
     GCC="$TC/riscv-none-elf-gcc"
     OBJCOPY="$TC/riscv-none-elf-objcopy"

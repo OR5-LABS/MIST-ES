@@ -18,7 +18,7 @@
 set -uo pipefail
 cd "$(dirname "$0")"
 
-TC="${RISCV_TC:-}"
+TC="${RISCV_TC:-/opt/riscv/bin}"
 if [[ -n "$TC" && -x "$TC/riscv-none-elf-gcc" ]]; then
   GCC="$TC/riscv-none-elf-gcc"; OBJCOPY="$TC/riscv-none-elf-objcopy"
 elif command -v riscv-none-elf-gcc &>/dev/null; then

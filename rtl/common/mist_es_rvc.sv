@@ -92,8 +92,6 @@ module mist_es_rvc (
                            instr16[2],  instr16[6],   4'b0000};
                 if (nzimm16 == 10'h0) begin instr32 = 32'h0; decomp_illegal = 1'b1; end
                 else instr32 = {{2{nzimm16[9]}}, nzimm16, 5'd2, 3'b000, 5'd2, 7'b001_0011};
-              end else if (rd_full == 5'd0) begin
-                instr32 = 32'h0; decomp_illegal = 1'b1;
               end else begin
                 lui_nzimm = {instr16[12], instr16[6:2]};
                 if (lui_nzimm == 6'h0) begin instr32 = 32'h0; decomp_illegal = 1'b1; end
