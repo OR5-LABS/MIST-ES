@@ -74,10 +74,10 @@ Enable the secure configuration via the `SECURE` RTL parameter or compile-time d
 
 Measured in cycle-accurate Verilator simulation compiled with `riscv-none-elf-gcc -O2 -march=rv32imc_zicsr -mabi=ilp32`.
 
-| Benchmark | Result | Details |
-| :--- | :--- | :--- |
-| **CoreMark** (1,000 iterations) | **1.18 CoreMark/MHz** | 847,547.1 cycles/iter, CRCs validated |
-| **Dhrystone 2.1** (100,000 runs) | **0.388 DMIPS/MHz** | 683 Dhrystones/sec/MHz, 2.973 CPI |
+| Benchmark | Result |
+| :--- | :--- |
+| **CoreMark** (1,000 iterations) | **1.18 CoreMark/MHz** |
+| **Dhrystone 2.1** (100,000 runs) | **0.388 DMIPS/MHz** |
 
 ```bash
 # Run CoreMark simulation
@@ -86,8 +86,6 @@ cd bench && make verilator-mist-es && make run-mist-es-coremark ITERATIONS=1000
 # Run Dhrystone simulation
 cd dhrystone && ./run_dhrystone.sh
 ```
-
-Detailed results, compiler flags, and methodology: **[benchmark.md](benchmark.md)**
 
 ---
 
@@ -191,15 +189,14 @@ Tested via in-memory signature extraction and automated bit-for-bit `diff` compa
 ./run_arch_test.sh secure            # SECURE build (U-mode + PMP + ECC)
 ```
 
-| Suite | Tests | Default Build | SECURE Build | Status |
-| :--- | :---: | :---: | :---: | :---: |
-| **RV32I — Base Integer** | 38 | 38 PASS | 38 PASS | **PASS (100%)** |
-| **RV32M — Multiply & Divide** | 8 | 8 PASS | 8 PASS | **PASS (100%)** |
-| **RV32C — Compressed Instructions** | 27 | 26 PASS (1 skip*) | 26 PASS (1 skip*) | **PASS (100%)** |
-| **Total** | **73** | **72 passed (1 skip)** | **72 passed (1 skip)** | **PASS (100%)** |
+| Suite | Tests |
+| :--- | :---: |
+| RV32I — Base Integer | 38 |
+| RV32M — Multiply & Divide | 8 |
+| RV32C — Compressed Instructions | 27 |
+| **Total** | **73** |
 
-> [!NOTE]  
-> *`cebreak-01` skip note: MIST-ES writes `mtval = 0` on breakpoint traps per §3.1.20 of the RISC-V Privileged Architecture Specification ("*When a breakpoint exception is generated, mtval is written with the address of the faulting instruction, or zero*"), whereas the reference signature model expects `mtval = faulting_pc`.
+The `arch-test/` directory contains only the target port (`target/mist_es/`) and the test runner (`run_arch_test.sh`). The upstream RISC-V test suite is cloned on demand and is gitignored.
 
 ### 2. Official ISA Tests (`riscv-tests`)
 
@@ -207,15 +204,13 @@ Tested via in-memory signature extraction and automated bit-for-bit `diff` compa
 ./run_isa.sh all                     # run rv32ui, rv32um, rv32uc, rv32mi on both builds
 ```
 
-| Suite | Default Build | SECURE Build (U-mode) |
-| :--- | :---: | :---: |
-| `rv32ui` | 41 / 41 pass, 1 skipped* | 41 / 41 pass, 1 skipped* |
-| `rv32um` | 8 / 8 pass | 8 / 8 pass |
-| `rv32uc` | 1 / 1 pass | 1 / 1 pass |
-| `rv32mi` | 15 / 15 pass, 1 skipped* | 16 / 16 pass |
-| **Total** | **65 passed, 0 failed, 2 skipped** | **66 passed, 0 failed, 1 skipped** |
-
-*`rv32ui/fence_i` skipped (Zifencei is omitted by architectural design; raises illegal instruction trap); `rv32mi/pmpaddr` skipped on default build (PMP is implemented exclusively on the SECURE build, where it passes).
+| Suite | Tests |
+| :--- | :---: |
+| `rv32ui` (Base User-Level Integer) | 42 |
+| `rv32um` (Standard Extension for Integer Multiplication & Division) | 8 |
+| `rv32uc` (Standard Extension for Compressed Instructions) | 1 |
+| `rv32mi` (Machine-Mode Privilege & Traps) | 16 |
+| **Total** | **67** |
 
 ---
 
