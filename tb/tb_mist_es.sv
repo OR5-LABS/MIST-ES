@@ -30,7 +30,17 @@ module tb_mist_es;
   logic        retire_rd_we;
   logic [4:0]  retire_rd;
 
-  mist_es_soc dut (
+`ifndef IMEM_WORDS
+  `define IMEM_WORDS 8192
+`endif
+`ifndef DRAM_WORDS
+  `define DRAM_WORDS 8192
+`endif
+
+  mist_es_soc #(
+    .IMEM_WORDS(`IMEM_WORDS),
+    .DRAM_WORDS(`DRAM_WORDS)
+  ) dut (
     .clk(clk), .rst(rst),
     .tck(1'b0), .tms(1'b0), .tdi(1'b0), .tdo(),
     .tohost(tohost), .tohost_we(tohost_we),
@@ -53,9 +63,9 @@ module tb_mist_es;
     if ($value$plusargs("TRACE=%d", trace_en)) ;
     if ($value$plusargs("MAXCYC=%d", max_cyc)) ;
 
-    // clear memories
+    // clear memories (small default window to avoid startup lag on large test models)
     for (i = 0; i < 8192; i = i + 1) begin
-      dut.imem[i] = 32'h0000_0013;   // NOP fill
+      dut.imem[i] = 32'h0000_0013;
       dut.dram[i] = 32'h0;
     end
 
@@ -95,12 +105,32 @@ module tb_mist_es;
         if (dut.dmem_be[b]) dut.imem[dut.imem_didx][b*8 +: 8] <= dut.dmem_wdata[b*8 +: 8];
   end
 
+  // optional signature dumping for architectural tests
+  string sig_file;
+  logic [31:0] sig_begin, sig_end;
+  integer sig_fd, sig_addr;
+
   // exit on tohost
   integer cycle = 0;
   always @(posedge clk) begin
     if (!rst) cycle <= cycle + 1;
     if (tohost_we) begin
       $display("[TB] tohost write: 0x%08x at cycle %0d", tohost, cycle);
+      if ($value$plusargs("SIG_FILE=%s", sig_file) &&
+          $value$plusargs("SIG_BEGIN=%h", sig_begin) &&
+          $value$plusargs("SIG_END=%h", sig_end)) begin
+        sig_fd = $fopen(sig_file, "w");
+        if (sig_fd != 0) begin
+          for (sig_addr = sig_begin; sig_addr < sig_end; sig_addr = sig_addr + 4) begin
+            if (sig_addr >= 32'h8000_0000)
+              $fdisplay(sig_fd, "%08x", dut.dram[(sig_addr - 32'h8000_0000) >> 2]);
+            else
+              $fdisplay(sig_fd, "%08x", dut.imem[sig_addr >> 2]);
+          end
+          $fclose(sig_fd);
+          $display("[TB] Signature dumped to %s (%0d words)", sig_file, (sig_end - sig_begin) >> 2);
+        end
+      end
       if (tohost == 32'd1) $display("[TB] PASS");
       else                 $display("[TB] FAIL (code %0d)", tohost);
       $finish;
