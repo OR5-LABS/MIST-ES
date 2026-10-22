@@ -225,7 +225,7 @@ MIST-ES ships in two build-time configurations, selected by the `SECURE` RTL par
 ## Repository Layout
 
 ```
-MISt-ES/
+MIST-ES/
 ├── Makefile                    top-level build & test entry point
 ├── build.sh                    fine-grained simulation & test driver
 ├── run_tests.sh                automated regression runner (checks against tests/expected.txt)
