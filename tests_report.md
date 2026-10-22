@@ -121,8 +121,8 @@ PASS    dhrystone/run_dhrystone.sh
 
 The repository integrates the official **RISC-V Architecture Test suite** ([riscv-non-isa/riscv-arch-test](https://github.com/riscv-non-isa/riscv-arch-test)), certifying architectural compliance via in-memory signature extraction and exact bit-for-bit comparison against official golden reference signatures (`.reference_output`) generated and curated by RISC-V International.
 
-- **Target Environment:** `arch-test/target/mist_es` ([model_test.h](file:///home/raghav/or5/cores/multicycle/MISt-ES/arch-test/target/mist_es/model_test.h), [link.ld](file:///home/raghav/or5/cores/multicycle/MISt-ES/arch-test/target/mist_es/link.ld))
-- **Automated Runner:** [run_arch_test.sh](file:///home/raghav/or5/cores/multicycle/MISt-ES/run_arch_test.sh)
+- **Target Environment:** `arch-test/target/mist_es` ([model_test.h](file:///home/raghav/or5/cores/multicycle/MIST-ES/arch-test/target/mist_es/model_test.h), [link.ld](file:///home/raghav/or5/cores/multicycle/MIST-ES/arch-test/target/mist_es/link.ld))
+- **Automated Runner:** [run_arch_test.sh](file:///home/raghav/or5/cores/multicycle/MIST-ES/run_arch_test.sh)
 - **Signature Mechanism:** The simulation testbench captures the signature region between symbols `begin_signature` and `end_signature` directly from memory when the test writes to `tohost` (`0x2000_0000`), dumping lowercase 32-bit hex words (`%08x`) to `<test>.sig.out` and diffing against `.reference_output`.
 
 ---
