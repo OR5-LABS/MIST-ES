@@ -89,9 +89,3 @@ All benchmark metrics are measured across 100,000 runs in cycle-accurate Verilat
 
 - **`./run_dhrystone.sh`**:
   Compiles Dhrystone with `riscv-none-elf-gcc` (GCC 13.2.0), runs 100,000 iterations in Verilator simulation, validates string/pointer self-check outputs, and prints DMIPS metrics.
-
----
-
-## Execution Screenshot
-
-![Dhrystone Simulation Output](dhry_sim.png)

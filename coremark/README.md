@@ -92,8 +92,3 @@ The `coremark/` directory provides shell drivers for running and reproducing Cor
 - **`./run_coremark_10.sh`**:
   Sanity check driver running 10 iterations (~2 to 5 seconds) for quick verification of RTL or toolchain changes.
 
----
-
-## Execution Screenshot
-
-![CoreMark Simulation Output](coremark_sim.png)
