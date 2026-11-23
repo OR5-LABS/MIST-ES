@@ -35,7 +35,7 @@ BENCH_CMD="${1:-all}"
 # ---------------------------------------------------------------------------
 # Toolchain detection (same logic as bench/Makefile)
 # ---------------------------------------------------------------------------
-TC="${RISCV_TC:-/opt/riscv/bin}"
+TC="${RISCV_TC:-}"
 if [[ -n "$TC" && -x "$TC/riscv-none-elf-gcc" ]]; then
     GCC="$TC/riscv-none-elf-gcc"
     OBJCOPY="$TC/riscv-none-elf-objcopy"
@@ -51,6 +51,9 @@ elif command -v riscv64-elf-gcc &>/dev/null; then
 elif command -v riscv32-unknown-elf-gcc &>/dev/null; then
     GCC="riscv32-unknown-elf-gcc"
     OBJCOPY="riscv32-unknown-elf-objcopy"
+elif [[ -x "/opt/riscv/bin/riscv-none-elf-gcc" ]]; then
+    GCC="/opt/riscv/bin/riscv-none-elf-gcc"
+    OBJCOPY="/opt/riscv/bin/riscv-none-elf-objcopy"
 else
     echo "ERROR: No RISC-V GCC found. Set RISCV_TC or ensure riscv-none-elf-gcc / riscv64-unknown-elf-gcc is in your PATH."
     exit 1

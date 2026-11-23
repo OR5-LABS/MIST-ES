@@ -6,7 +6,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" &> /dev/null && pwd)"
 MIST_ES_DIR="$(dirname "$SCRIPT_DIR")"
 
 # Detect RISC-V GCC
-TC="${RISCV_TC:-/opt/riscv/bin}"
+TC="${RISCV_TC:-}"
 if [[ -n "$TC" && -x "$TC/riscv-none-elf-gcc" ]]; then
     RISCV_GCC="$TC/riscv-none-elf-gcc"
 elif command -v riscv-none-elf-gcc &>/dev/null; then
@@ -17,6 +17,8 @@ elif command -v riscv32-unknown-elf-gcc &>/dev/null; then
     RISCV_GCC="riscv32-unknown-elf-gcc"
 elif command -v riscv64-elf-gcc &>/dev/null; then
     RISCV_GCC="riscv64-elf-gcc"
+elif [[ -x "/opt/riscv/bin/riscv-none-elf-gcc" ]]; then
+    RISCV_GCC="/opt/riscv/bin/riscv-none-elf-gcc"
 else
     echo "ERROR: No RISC-V GCC found. Set RISCV_TC or ensure riscv-none-elf-gcc / riscv64-unknown-elf-gcc is in your PATH."
     exit 1

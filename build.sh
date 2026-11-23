@@ -65,7 +65,7 @@ fi
 
 # ---- SECURE config: U-mode + PMP / ePMP -----------------------------------
 if [[ "$ACTION" == "pmp" || "$ACTION" == "epmp" || "$ACTION" == "upriv" || "$ACTION" == "mml" ]]; then
-  TC="${RISCV_TC:-/opt/riscv/bin}"
+  TC="${RISCV_TC:-}"
   GCC=""
   OBJCOPY=""
   if [[ -n "$TC" && -x "$TC/riscv-none-elf-gcc" ]]; then
@@ -83,6 +83,9 @@ if [[ "$ACTION" == "pmp" || "$ACTION" == "epmp" || "$ACTION" == "upriv" || "$ACT
   elif command -v riscv32-unknown-elf-gcc &>/dev/null; then
     GCC=$(command -v riscv32-unknown-elf-gcc)
     OBJCOPY=$(command -v riscv32-unknown-elf-objcopy)
+  elif [[ -x "/opt/riscv/bin/riscv-none-elf-gcc" ]]; then
+    GCC="/opt/riscv/bin/riscv-none-elf-gcc"
+    OBJCOPY="/opt/riscv/bin/riscv-none-elf-objcopy"
   fi
 
   SRCASM=sw/pmp_test.S; HEXNAME=pmp

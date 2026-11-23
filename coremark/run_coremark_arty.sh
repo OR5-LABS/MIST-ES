@@ -16,17 +16,21 @@ cp ../bench/build/coremark.hex "${BUILD_DIR}/firmware.mem" 2>/dev/null || true
 echo "Running Vivado synthesis for Arty A7-100T..."
 cd ../fpga/arty_a7
 
-if [ -z "${VIVADO_SETTINGS:-}" ]; then
-    if [ -f "${HOME}/Vivado/2023.2/settings64.sh" ]; then
-        VIVADO_SETTINGS="${HOME}/Vivado/2023.2/settings64.sh"
-    elif [ -f "/tools/Xilinx/Vivado/2023.2/settings64.sh" ]; then
-        VIVADO_SETTINGS="/tools/Xilinx/Vivado/2023.2/settings64.sh"
-    elif [ -f "/opt/Xilinx/Vivado/2023.2/settings64.sh" ]; then
-        VIVADO_SETTINGS="/opt/Xilinx/Vivado/2023.2/settings64.sh"
+if command -v vivado &> /dev/null; then
+    :
+else
+    if [ -z "${VIVADO_SETTINGS:-}" ]; then
+        if [ -f "${HOME}/Vivado/2023.2/settings64.sh" ]; then
+            VIVADO_SETTINGS="${HOME}/Vivado/2023.2/settings64.sh"
+        elif [ -f "/tools/Xilinx/Vivado/2023.2/settings64.sh" ]; then
+            VIVADO_SETTINGS="/tools/Xilinx/Vivado/2023.2/settings64.sh"
+        elif [ -f "/opt/Xilinx/Vivado/2023.2/settings64.sh" ]; then
+            VIVADO_SETTINGS="/opt/Xilinx/Vivado/2023.2/settings64.sh"
+        fi
     fi
-fi
-if [ -n "${VIVADO_SETTINGS:-}" ] && [ -f "$VIVADO_SETTINGS" ]; then
-    source "$VIVADO_SETTINGS"
+    if [ -n "${VIVADO_SETTINGS:-}" ] && [ -f "$VIVADO_SETTINGS" ]; then
+        source "$VIVADO_SETTINGS"
+    fi
 fi
 
 if ! command -v vivado &> /dev/null; then

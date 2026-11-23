@@ -18,13 +18,15 @@
 set -uo pipefail
 cd "$(dirname "$0")"
 
-TC="${RISCV_TC:-/opt/riscv/bin}"
+TC="${RISCV_TC:-}"
 if [[ -n "$TC" && -x "$TC/riscv-none-elf-gcc" ]]; then
   GCC="$TC/riscv-none-elf-gcc"; OBJCOPY="$TC/riscv-none-elf-objcopy"
 elif command -v riscv-none-elf-gcc &>/dev/null; then
   GCC=riscv-none-elf-gcc; OBJCOPY=riscv-none-elf-objcopy
 elif command -v riscv64-unknown-elf-gcc &>/dev/null; then
   GCC=riscv64-unknown-elf-gcc; OBJCOPY=riscv64-unknown-elf-objcopy
+elif [[ -x "/opt/riscv/bin/riscv-none-elf-gcc" ]]; then
+  GCC="/opt/riscv/bin/riscv-none-elf-gcc"; OBJCOPY="/opt/riscv/bin/riscv-none-elf-objcopy"
 else
   echo "run_isa.sh: no RISC-V GCC found (set RISCV_TC)"; exit 1
 fi
