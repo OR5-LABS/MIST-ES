@@ -1,0 +1,158 @@
+{
+  "core": "MIST-ES",
+  "description": "Area-optimized multi-cycle RV32IMC + Zicsr core with physical memory protection and security extensions",
+  "verification_status": "PASS",
+  "regression": {
+    "all_passed": true,
+    "targets": [
+      {
+        "target": "build.sh:sim",
+        "exit_code": 0,
+        "pass_lines": 1,
+        "fail_lines": 0,
+        "verdict": "PASS"
+      },
+      {
+        "target": "build.sh:cosim",
+        "exit_code": 0,
+        "pass_lines": 1,
+        "fail_lines": 0,
+        "verdict": "PASS"
+      },
+      {
+        "target": "build.sh:rvfi",
+        "exit_code": 0,
+        "pass_lines": 2,
+        "fail_lines": 0,
+        "verdict": "PASS"
+      },
+      {
+        "target": "build.sh:debug",
+        "exit_code": 0,
+        "pass_lines": 2,
+        "fail_lines": 0,
+        "verdict": "PASS"
+      },
+      {
+        "target": "build.sh:pmp",
+        "exit_code": 0,
+        "pass_lines": 1,
+        "fail_lines": 0,
+        "verdict": "PASS"
+      },
+      {
+        "target": "build.sh:epmp",
+        "exit_code": 0,
+        "pass_lines": 1,
+        "fail_lines": 0,
+        "verdict": "PASS"
+      },
+      {
+        "target": "build.sh:upriv",
+        "exit_code": 0,
+        "pass_lines": 1,
+        "fail_lines": 0,
+        "verdict": "PASS"
+      },
+      {
+        "target": "build.sh:mml",
+        "exit_code": 0,
+        "pass_lines": 1,
+        "fail_lines": 0,
+        "verdict": "PASS"
+      },
+      {
+        "target": "build.sh:ecc",
+        "exit_code": 0,
+        "pass_lines": 1,
+        "fail_lines": 0,
+        "verdict": "PASS"
+      },
+      {
+        "target": "build.sh:axil",
+        "exit_code": 0,
+        "pass_lines": 2,
+        "fail_lines": 0,
+        "verdict": "PASS"
+      },
+      {
+        "target": "build.sh:fpga",
+        "exit_code": 0,
+        "pass_lines": 2,
+        "fail_lines": 0,
+        "verdict": "PASS"
+      },
+      {
+        "target": "run_isa.sh:all",
+        "exit_code": 0,
+        "pass_lines": 131,
+        "fail_lines": 0,
+        "verdict": "PASS"
+      },
+      {
+        "target": "coremark/run_coremark_10.sh",
+        "exit_code": 0,
+        "pass_lines": 2,
+        "fail_lines": 0,
+        "verdict": "PASS"
+      },
+      {
+        "target": "dhrystone/run_dhrystone.sh",
+        "exit_code": 0,
+        "pass_lines": 3,
+        "fail_lines": 0,
+        "verdict": "PASS"
+      }
+    ]
+  },
+  "coremark": {
+    "iterations": 10,
+    "total_cycles": 8475505,
+    "sim_cycles": 8552569,
+    "cycles_per_iteration": 847550.5,
+    "coremark_per_mhz": 1.1799,
+    "crc_valid": true,
+    "seedcrc": "0xe9f5",
+    "crclist": "0xe714",
+    "crcmatrix": "0x1fd7",
+    "crcstate": "0x8e3a",
+    "crcfinal": "0xfcaf",
+    "status": "PASS"
+  },
+  "dhrystone": {
+    "runs": 100000,
+    "total_cycles": 146300070,
+    "sim_cycles": 146447774,
+    "retired_instructions": 49200030,
+    "cpi": 2.973,
+    "ipc": 0.33636,
+    "dhrystones_per_sec_per_mhz": 683,
+    "dmips_per_mhz": 0.388,
+    "status": "PASS"
+  },
+  "isa": {
+    "total_configs": 2,
+    "total_tests": 134,
+    "executed": 131,
+    "passed": 131,
+    "failed": 0,
+    "skipped_count": 3,
+    "skipped_tests": [
+      {
+        "config": "default",
+        "test": "rv32ui/fence_i",
+        "reason": "Zifencei is not implemented: FENCE.I raises an illegal-instruction trap"
+      },
+      {
+        "config": "default",
+        "test": "rv32mi/pmpaddr",
+        "reason": "test assumes PMP; the default build has none (runs on the SECURE build)"
+      },
+      {
+        "config": "secure",
+        "test": "rv32ui/fence_i",
+        "reason": "Zifencei is not implemented: FENCE.I raises an illegal-instruction trap"
+      }
+    ]
+  }
+}
