@@ -30,7 +30,7 @@ A compact, fully verified **RV32IMC** processor core in synthesizable SystemVeri
 | **Bus Interfaces** | Native memory port + AXI4-Lite master/slave bridge |
 | **Debug** | RISC-V External Debug via JTAG (debug spec 0.13, DTM + DM) |
 | **Arch Compliance** | Official RISC-V Architectural Test Suite (`riscv-arch-test`) + `riscv-tests` |
-| **Target FPGA** | Artix-7 100T (Digilent Arty A7) |
+| **Target FPGA** | Digilent Arty A7-100T (xc7a100tcsg324-1) |
 
 ---
 
@@ -43,32 +43,28 @@ A compact, fully verified **RV32IMC** processor core in synthesizable SystemVeri
 - **Hardware-Resolved Misalignment:** Unaligned loads and stores are handled natively in hardware as two memory beats without raising exceptions
 - **RISC-V External Debug over JTAG:** JTAG Debug Transport Module (DTM) and RISC-V Debug Module (0.13 spec) supporting halt, register/CSR inspection, system-bus memory read/write, resume, and single-step
 - **Dual Bus Interfaces:** Zero-latency native memory port for tightly-coupled memory integration, plus drop-in **AXI4-Lite master/slave** bridge for standard SoC fabrics
-- **Clean Synthesizable RTL:** Pure SystemVerilog with no proprietary IP, tested on Artix-7 and verified across Icarus Verilog, Verilator, and Vivado
+- **Clean Synthesizable RTL:** Pure SystemVerilog with no proprietary IP, tested on Digilent Arty A7-100T and verified across Icarus Verilog, Verilator, and Vivado
 
 ---
 
 ## Resource Utilization
 
-Synthesized and implemented with **AMD Vivado 2023.2** targeting the **Xilinx Artix-7 100T** (`xc7a100tcsg324-1`) on the Digilent Arty A7 evaluation board.
+Synthesized and implemented with **AMD Vivado 2023.2** targeting the **Digilent Arty A7-100T** (`xc7a100tcsg324-1`) evaluation board.
 
-| Configuration | Slice LUTs | Registers (FF) | DSP48E1 | BRAM | Target Platform |
-| :--- | :---: | :---: | :---: | :---: | :---: |
-| Core — Default (M-mode only) | 2,491 | 749 | 4 | 0 | — |
-| Core — SECURE (M+U, PMP, ECC) | 4,362 | 1,400 | 4 | 0 | — |
-| Full SoC — Default (128 KB BRAM) | 2,816 | 1,335 | 4 | 32 | Digilent Arty A7 |
-| Full SoC — SECURE (128 KB BRAM) | 5,226 | 1,980 | 4 | 32 | Digilent Arty A7 |
+| Configuration | Slice LUTs | Logic LUTs | Memory LUTs | Registers (FF) | DSP48E1 | BRAM | LUT Utilization | Target Platform |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| **MIST-ES Core (Default RV32IMC)** | 2,611 | 2,563 | 48 | 751 | 4 | 0 | 4.1% | Digilent Arty A7-100T (xc7a100tcsg324-1) |
 
-Enable the secure configuration via the `SECURE` RTL parameter or compile-time define `-DMIST_ES_SECURE`.
+*Authentic Vivado 2023.2 out-of-context synthesis results for xc7a100tcsg324-1: 2,611 Slice LUTs (2,563 Logic, 48 Mem), 751 FFs, 4 DSPs, 0 BRAM (4.1% LUT util).*
 
 ### Core Hierarchical Utilization Breakdown
 
-| Sub-Module / Unit | Description | Default LUTs (FFs) | SECURE LUTs (FFs) |
-| :--- | :--- | :---: | :---: |
-| `mist_es_regfile` | GPR File (32×32-bit, plain vs SECDED ECC) | 1,403 (0 FFs) | 1,596 (0 FFs) |
-| `mist_es_csr` | CSR File (Zicsr, Machine/User, 8-region PMP/ePMP) | 389 (320 FFs) | 2,054 (965 FFs) |
-| `mist_es_muldiv` | 32-bit Iterative Multiply & Divide Engine | 437 (237 FFs) | 458 (237 FFs) |
-| `mist_es_pmp` | Physical Memory Protection Checker | — | 21 (0 FFs) |
-| Control & Exec | FSM, 32-bit ALU, Decoder, RVC Expander, ImmGen | 262 (192 FFs) | 269 (198 FFs) |
+| Sub-Module / Unit | Description | Total LUTs (Logic / Mem) | Registers (FF) | DSPs |
+| :--- | :--- | :---: | :---: | :---: |
+| `mist_es_regfile` | GPR File (`g_rf.u_rf`, 32×32-bit `x0`–`x31`) | 1,427 (1,379 / 48) | 0 | 0 |
+| `mist_es_muldiv` | 32-bit Iterative Multiply & Divide Engine (`u_md`) | 533 (533 / 0) | 237 | 4 |
+| `mist_es_csr` | CSR File (`u_csr`, Zicsr, Machine Mode) | 365 (365 / 0) | 322 | 0 |
+| `mist_es_core` (top) | FSM Sequencer, ALU, Decoder, ImmGen, Branch | 286 (286 / 0) | 192 | 0 |
 
 ---
 
@@ -99,7 +95,7 @@ cd dhrystone && ./run_dhrystone.sh
 | **Icarus Verilog** | 12.0 or later | Core simulation (`iverilog` / `vvp`) |
 | **Python** | 3.10 or later | Test-program builders, co-simulation, report generation |
 | **RISC-V GCC** | 13.0 or later (`riscv-none-elf-*` or `riscv64-unknown-elf-*`) | Compiling firmware, test suites, and benchmarks |
-| **Vivado** | 2023.2 *(optional)* | FPGA synthesis and implementation for Arty A7 |
+| **Vivado** | 2023.2 *(optional)* | FPGA synthesis and implementation for Digilent Arty A7-100T (xc7a100tcsg324-1) |
 
 Set `RISCV_TC=/path/to/toolchain/bin` to point at a non-`PATH` toolchain.
 
@@ -247,7 +243,7 @@ MIST-ES/
 │   └── riscv-tests/            official Berkeley RISC-V ISA tests
 ├── coremark/                   bare-metal CoreMark port & cycle-accurate runner
 ├── dhrystone/                  bare-metal Dhrystone 2.1 port & cycle-accurate runner
-├── fpga/                       FPGA top-level SoC wrapper + Arty A7 XDC constraints
+├── fpga/                       FPGA top-level SoC wrapper + Digilent Arty A7-100T XDC constraints
 ├── bench/                      benchmarking automation scripts & reporting
 ├── programs/                   assembly smoke test builders
 ├── sw/                         firmware, binary-to-hex utilities, bring-up tests
