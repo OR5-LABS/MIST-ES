@@ -22,6 +22,7 @@ cd "$(dirname "$0")"
 
 IVL="${IVERILOG:-iverilog}"
 VVP="${VVP:-vvp}"
+PYTHON="${PYTHON:-$(command -v python3 || command -v python)}"
 ACTION="${1:-sim}"
 
 R=rtl            # mist_es core + SoC
@@ -127,7 +128,7 @@ check_verdict smoke sim/smoke.log '^\[TB\] PASS'
 # ---- golden co-simulation --------------------------------------------------
 if [[ "$ACTION" == "cosim" ]]; then
   echo "Co-simulating against the golden RV32IM ISA model..."
-  VVP="$VVP" python tools/cosim.py \
+  VVP="$VVP" "$PYTHON" tools/cosim.py \
       --hex programs/build/smoke.hex --sim sim/tb_mist_es
 fi
 
