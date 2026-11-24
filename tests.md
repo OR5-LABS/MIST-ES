@@ -140,17 +140,17 @@ Structural code coverage is measured using **Verilator 5.020** with full line an
 
 | Module / Datapath Component | Verilog Source File | Instrumented Lines | Covered Lines | Line Coverage % | Sign-Off Verdict |
 | :--- | :--- | :---: | :---: | :---: | :---: |
-| **Branch Predictor & Compare** | [`mist_es_branch.sv`](file:///home/hex/OR5/CORES/MIST-ES/rtl/common/mist_es_branch.sv) | 12 | 12 | **100.00%** | **PASS** |
-| **Arithmetic Logic Unit (ALU)** | [`mist_es_alu.sv`](file:///home/hex/OR5/CORES/MIST-ES/rtl/common/mist_es_alu.sv) | 19 | 18 | **94.74%** | **PASS** |
-| **Compressed Decoder (RVC)** | [`mist_es_rvc.sv`](file:///home/hex/OR5/CORES/MIST-ES/rtl/common/mist_es_rvc.sv) | 129 | 116 | **89.92%** | **PASS** |
-| **Register File (32x32)** | [`mist_es_regfile.sv`](file:///home/hex/OR5/CORES/MIST-ES/rtl/common/mist_es_regfile.sv) | 14 | 12 | **85.71%** | **PASS** |
-| **Immediate Generator** | [`mist_es_immgen.sv`](file:///home/hex/OR5/CORES/MIST-ES/rtl/common/mist_es_immgen.sv) | 6 | 5 | **83.33%** | **PASS** |
-| **Hardware Multiplier / Divider** | [`mist_es_muldiv.sv`](file:///home/hex/OR5/CORES/MIST-ES/rtl/common/mist_es_muldiv.sv) | 94 | 77 | **81.91%** | **PASS** |
-| **Instruction Decoder** | [`mist_es_decode.sv`](file:///home/hex/OR5/CORES/MIST-ES/rtl/common/mist_es_decode.sv) | 100 | 80 | **80.00%** | **PASS** |
-| **Pipeline Core Datapath** | [`mist_es_core.sv`](file:///home/hex/OR5/CORES/MIST-ES/rtl/mist_es_core.sv) | 203 | 130 | **64.04%** | **PASS** |
-| **Control & Status Registers** | [`mist_es_csr.sv`](file:///home/hex/OR5/CORES/MIST-ES/rtl/common/mist_es_csr.sv) | 149 | 50 | **33.56%** | **PASS** |
-| **RISC-V Debug Module (0.13)** | [`mist_es_debug.sv`](file:///home/hex/OR5/CORES/MIST-ES/rtl/mist_es_debug.sv) | 205 | 33 | **16.10%** | **PASS** |
-| **Verification Harness Top** | [`bench_top.sv`](file:///home/hex/OR5/CORES/MIST-ES/bench/verilator/bench_top.sv) | 81 | 55 | **67.90%** | **PASS** |
+| **Branch Predictor & Compare** | [`mist_es_branch.sv`](rtl/common/mist_es_branch.sv) | 12 | 12 | **100.00%** | **PASS** |
+| **Arithmetic Logic Unit (ALU)** | [`mist_es_alu.sv`](rtl/common/mist_es_alu.sv) | 19 | 18 | **94.74%** | **PASS** |
+| **Compressed Decoder (RVC)** | [`mist_es_rvc.sv`](rtl/common/mist_es_rvc.sv) | 129 | 116 | **89.92%** | **PASS** |
+| **Register File (32x32)** | [`mist_es_regfile.sv`](rtl/common/mist_es_regfile.sv) | 14 | 12 | **85.71%** | **PASS** |
+| **Immediate Generator** | [`mist_es_immgen.sv`](rtl/common/mist_es_immgen.sv) | 6 | 5 | **83.33%** | **PASS** |
+| **Hardware Multiplier / Divider** | [`mist_es_muldiv.sv`](rtl/common/mist_es_muldiv.sv) | 94 | 77 | **81.91%** | **PASS** |
+| **Instruction Decoder** | [`mist_es_decode.sv`](rtl/common/mist_es_decode.sv) | 100 | 80 | **80.00%** | **PASS** |
+| **Pipeline Core Datapath** | [`mist_es_core.sv`](rtl/mist_es_core.sv) | 203 | 130 | **64.04%** | **PASS** |
+| **Control & Status Registers** | [`mist_es_csr.sv`](rtl/common/mist_es_csr.sv) | 149 | 50 | **33.56%** | **PASS** |
+| **RISC-V Debug Module (0.13)** | [`mist_es_debug.sv`](rtl/mist_es_debug.sv) | 205 | 33 | **16.10%** | **PASS** |
+| **Verification Harness Top** | [`bench_top.sv`](bench/verilator/bench_top.sv) | 81 | 55 | **67.90%** | **PASS** |
 | **Total Datapath & System** | *Aggregated* | **1,012** | **588** | **58.10%** | **PASS** |
 
 > **Coverage Analysis & Uncovered Path Disclosure:** Uncovered lines in `mist_es_csr.sv` and `mist_es_debug.sv` correspond to hardware debug abstract commands (progbuf, single-step via DTM) and unmapped machine-mode CSR addresses exercised exclusively during JTAG run-control tests (`build.sh:debug`). The core execution datapath achieves **>83% structural coverage**.
@@ -162,8 +162,6 @@ Structural code coverage is measured using **Verilator 5.020** with full line an
 All verification data recorded in this document is deterministically reproducible from git commit HEAD using the automated test harness:
 
 ```bash
-export PATH="/tmp/bin:$PATH"
-cd /home/hex/OR5/CORES/MIST-ES
 ./run_tests.sh
 ```
 The verification suite strictly enforces **zero synthetic shortcuts, zero skipped failing tests, and 100% authentic measured data** across all 18 OR5 production cores.
