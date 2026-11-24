@@ -25,6 +25,9 @@
 #if VM_TRACE
 #include "verilated_vcd_c.h"
 #endif
+#if VM_COVERAGE
+#include "verilated_cov.h"
+#endif
 
 #include <cstdio>
 #include <cstdlib>
@@ -234,6 +237,9 @@ int main(int argc, char* argv[])
     if (tfp) { tfp->close(); delete tfp; }
 #endif
     top->final();
+#if VM_COVERAGE
+    VerilatedCov::write("sim/coverage.dat");
+#endif
     delete top;
     delete ctx;
     return exit_code;
