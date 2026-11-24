@@ -38,7 +38,7 @@ These targets test the core datapath, FSM control logic, formal interface, debug
 | **Hardware Debug Module** | `./build.sh debug` | JTAG DTM (0.13) + Debug Module bit-bang simulation | IDCODE `0x4D49_5355` verified; `halt`, `resume`, register R/W, `step` pass |  **PASS** |
 | **Register File ECC** | `./build.sh ecc` | SECDED (39, 32) Hamming code unit test | Single-bit errors auto-corrected; double-bit errors detected (`ecc_double_err = 1`) |  **PASS** |
 | **AXI4-Lite Bridge** | `./build.sh axil` | Multi-cycle memory to AXI4-Lite master/slave protocol conversion | Channel transactions (`AW`, `W`, `B`, `AR`, `R`) validated under synthetic wait-states |  **PASS** |
-| **FPGA SoC Simulation** | `./build.sh fpga` | Top-level Arty A7 FPGA SoC simulation (`mist_es_fpga.sv`) | Simulated 115200 baud UART banner transmitted (**28 bytes**); LED register verified (`0x01`) |  **PASS** |
+| **FPGA SoC Simulation** | `./build.sh fpga` | Top-level Digilent Arty A7-100T FPGA SoC simulation (`mist_es_fpga.sv`) | Simulated 115200 baud UART banner transmitted (**28 bytes**); LED register verified (`0x01`) |  **PASS** |
 
 ---
 
@@ -121,8 +121,8 @@ PASS    dhrystone/run_dhrystone.sh
 
 The repository integrates the official **RISC-V Architecture Test suite** ([riscv-non-isa/riscv-arch-test](https://github.com/riscv-non-isa/riscv-arch-test)), certifying architectural compliance via in-memory signature extraction and exact bit-for-bit comparison against official golden reference signatures (`.reference_output`) generated and curated by RISC-V International.
 
-- **Target Environment:** `arch-test/target/mist_es` ([model_test.h](file:///home/raghav/or5/cores/multicycle/MIST-ES/arch-test/target/mist_es/model_test.h), [link.ld](file:///home/raghav/or5/cores/multicycle/MIST-ES/arch-test/target/mist_es/link.ld))
-- **Automated Runner:** [run_arch_test.sh](file:///home/raghav/or5/cores/multicycle/MIST-ES/run_arch_test.sh)
+- **Target Environment:** `arch-test/target/mist_es` (`model_test.h`, `link.ld`)
+- **Automated Runner:** `run_arch_test.sh`
 - **Signature Mechanism:** The simulation testbench captures the signature region between symbols `begin_signature` and `end_signature` directly from memory when the test writes to `tohost` (`0x2000_0000`), dumping lowercase 32-bit hex words (`%08x`) to `<test>.sig.out` and diffing against `.reference_output`.
 
 ---
