@@ -33,6 +33,8 @@ echo "========================================="
 cd "$SCRIPT_DIR"
 mkdir -p build
 
+RUNS="${1:-100000}"
+
 COMMON_CFLAGS="-march=rv32imc_zicsr -mabi=ilp32 -O2 -ffreestanding -ffunction-sections -fdata-sections -fno-builtin -fno-common -Wall -nostdlib -nostartfiles"
 INCLUDES="-I. -I../bench/common"
 
@@ -40,7 +42,7 @@ INCLUDES="-I. -I../bench/common"
 # -DTIME: Use time() function
 # -DRISCV: Print RISC-V specific metrics
 # -Wno-implicit-int -Wno-return-type: Dhrystone 2.1 is old K&R C
-DHRY_CFLAGS="-std=gnu99 -DNUM_RUNS=100000 -DTIME -DRISCV -Wno-implicit-int -Wno-return-type -Wno-implicit-function-declaration"
+DHRY_CFLAGS="-std=gnu99 -DNUM_RUNS=${RUNS} -DTIME -DRISCV -Wno-implicit-int -Wno-return-type -Wno-implicit-function-declaration"
 
 # Source files
 SRCS=(
