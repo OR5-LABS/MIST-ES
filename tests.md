@@ -59,6 +59,15 @@ The core is verified against the official RISC-V compliance test suites adapted 
 | **rv32mi** | Machine privilege, PMP, and CSR suites | 58 | 58 | **100.0%** | **PASS** |
 | **TOTAL** | **Full Ratified Instruction Set Coverage** | **131** | **131** | **100.0%** | **PASS** |
 
+### Official RISC-V Architectural Tests (`riscv-arch-test`)
+
+| Architecture Suite | Covered Instruction Profile | Tests Run | Tests Passed | Pass Rate | Status |
+| :--- | :--- | :---: | :---: | :---: | :---: |
+| **rv32i_m/I** | Base Integer Instruction Set | 38 | 38 | **100.0%** | **PASS** |
+| **rv32i_m/M** | Standard Extension for Integer Multi/Div | 8 | 8 | **100.0%** | **PASS** |
+| **rv32i_m/C** | Standard Extension for Compressed Instructions | 27 | 27 | **100.0%** | **PASS** |
+| **Total `riscv-arch-test`** | **Complete Official Architectural Signature Match** | **73** | **73** | **100.0%** | **PASS** |
+
 ---
 
 ## 4. Benchmark Characterization & Performance Values
