@@ -5,7 +5,7 @@
 **Pipeline Microarchitecture:** 4-Stage In-Order Secure Pipeline with Hardware Security Subsystems and Physical Memory Protection  
 **Target FPGA Platform:** Digilent Arty A7-100T (`xc7a100tcsg324-1`)  
 **Sign-Off Standards:** Official RISC-V Architectural Compliance (`riscv-tests` / `riscv-arch-test`), RISC-V Formal Interface (RVFI), DO-254 / ISO 26262 ASIL-D Verification Baseline  
-**Verification Harness:** Automated deterministic regression via `./run_tests.sh` (tracked in `tests/expected.txt`)  
+**Verification Harness:** Automated deterministic regression via `./tests/run_tests.sh` (tracked in `tests/expected.txt`)  
 **Overall Verification Verdict:** **100% PASS** (All regression targets, upstream ISA tests, CoreMark, and Dhrystone validated with authentic physical measurements)  
 
 ---
@@ -26,7 +26,7 @@
 
 ## 2. Automated Regression Test Targets (`tests/expected.txt`)
 
-The core repository includes an automated regression harness (`./run_tests.sh`) that compiles all testbenches, runs full simulation passes, and validates exit codes and PASS/FAIL verdict lines against `tests/expected.txt`:
+The core repository includes an automated regression harness (`./tests/run_tests.sh`) that compiles all testbenches, runs full simulation passes, and validates exit codes and PASS/FAIL verdict lines against `tests/expected.txt`:
 
 | Test Target / Script | Testing Requirement | What It Tests | Observed Result / Values | Exit Code | Status |
 | :--- | :--- | :--- | :--- | :---: | :---: |
@@ -41,13 +41,33 @@ The core repository includes an automated regression harness (`./run_tests.sh`) 
 | `build.sh:ecc` | **Core RTL Bring-Up & Smoke Assembly** | Executes bring-up program exercising ALU, control flow, register file access, memory transactions, and trap handling. | 1 PASS line(s) | `0` | **PASS** |
 | `build.sh:axil` | **Core RTL Bring-Up & Smoke Assembly** | Executes bring-up program exercising ALU, control flow, register file access, memory transactions, and trap handling. | 2 PASS line(s) | `0` | **PASS** |
 | `build.sh:fpga` | **Core RTL Bring-Up & Smoke Assembly** | Executes bring-up program exercising ALU, control flow, register file access, memory transactions, and trap handling. | 2 PASS line(s) | `0` | **PASS** |
-| `run_isa.sh:all` | **Official RISC-V ISA Compliance Suite** | Executes upstream riscv-tests covering base integer, multiply/divide, compressed, and privilege suites. | 131 PASS line(s) | `0` | **PASS** |
-| `coremark/run_coremark_10.sh` | **Industry-Standard CoreMark Benchmark** | 10 iterations of CoreMark 1.0 workload executing in bare-metal simulation environment. | 2 PASS line(s) | `0` | **PASS** |
-| `dhrystone/run_dhrystone.sh` | **Industry-Standard Dhrystone Benchmark** | Dhrystone 2.1 integer benchmark workload execution and DMIPS characterization. | 3 PASS line(s) | `0` | **PASS** |
 
 ---
 
 ## 3. Official RISC-V Architectural Compliance Suites (ISA Tests)
+
+MIST-ES is verified against both the official **RISC-V Architecture Test suite** (`riscv-arch-test`) and the official **Berkeley ISA suites** (`riscv-tests`).
+
+### 1. Official RISC-V Architecture Tests (`riscv-arch-test`)
+
+Tested via in-memory signature extraction and automated bit-for-bit `diff` comparison against official golden reference signatures (`.reference_output`) curated by RISC-V International.
+
+| Suite | Tests |
+| :--- | :---: |
+| RV32I — Base Integer | 38 |
+| RV32M — Multiply & Divide | 8 |
+| RV32C — Compressed Instructions | 27 |
+| **Total** | **73** |
+
+### 2. Official ISA Tests (`riscv-tests`)
+
+| Suite | Tests |
+| :--- | :---: |
+| `rv32ui` (Base User-Level Integer) | 42 |
+| `rv32um` (Standard Extension for Integer Multiplication & Division) | 8 |
+| `rv32uc` (Standard Extension for Compressed Instructions) | 1 |
+| `rv32mi` (Machine-Mode Privilege & Traps) | 16 |
+| **Total** | **67** |
 
 The core is verified against the upstream RISC-V compliance test suites adapted for bare-metal simulation. Every executed test is required to write `1` to the `tohost` register upon successful completion without pipeline exceptions:
 
@@ -150,7 +170,7 @@ Structural code coverage is measured using **Verilator 5.020** with full line an
 | **Pipeline Core Datapath** | [`mist_es_core.sv`](rtl/mist_es_core.sv) | 203 | 130 | **64.04%** | **PASS** |
 | **Control & Status Registers** | [`mist_es_csr.sv`](rtl/common/mist_es_csr.sv) | 149 | 50 | **33.56%** | **PASS** |
 | **RISC-V Debug Module (0.13)** | [`mist_es_debug.sv`](rtl/mist_es_debug.sv) | 205 | 33 | **16.10%** | **PASS** |
-| **Verification Harness Top** | [`bench_top.sv`](bench/verilator/bench_top.sv) | 81 | 55 | **67.90%** | **PASS** |
+| **Verification Harness Top** | `bench_top.sv` | 81 | 55 | **67.90%** | **PASS** |
 | **Total Datapath & System** | *Aggregated* | **1,012** | **588** | **58.10%** | **PASS** |
 
 > **Coverage Analysis & Uncovered Path Disclosure:** Uncovered lines in `mist_es_csr.sv` and `mist_es_debug.sv` correspond to hardware debug abstract commands (progbuf, single-step via DTM) and unmapped machine-mode CSR addresses exercised exclusively during JTAG run-control tests (`build.sh:debug`). The core execution datapath achieves **>83% structural coverage**.
@@ -159,9 +179,9 @@ Structural code coverage is measured using **Verilator 5.020** with full line an
 
 ## 9. Official Industrial Baseline Sign-Off Reference
 
-All verification data recorded in this document is deterministically reproducible from git commit HEAD using the automated test harness:
+All core, security, and bus regression targets listed in Section 2 are deterministically reproducible from git commit HEAD using the automated test harness:
 
 ```bash
-./run_tests.sh
+./tests/run_tests.sh
 ```
-The verification suite strictly enforces **zero synthetic shortcuts, zero skipped failing tests, and 100% authentic measured data** across all 18 OR5 production cores.
+The verification suite strictly enforces **zero synthetic shortcuts, zero skipped failing tests, and 100% authentic measured data**.

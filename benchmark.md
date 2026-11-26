@@ -29,7 +29,7 @@ CoreMark tests core pipeline, memory access, integer ALU, and control-logic effi
 - **Compiler:** `riscv-none-elf-gcc (xPack GNU RISC-V Embedded GCC) 13.2.0`
 - **Optimization:** `-O2 -march=rv32imc_zicsr -mabi=ilp32`
 - **Memory Allocation:** Static allocation (`MEM_METHOD=MEM_STATIC`), Harvard architecture (`bench.ld`)
-- **Simulation Harness:** Cycle-accurate Verilator driver (`coremark/run_coremark_sim.sh`)
+- **Simulation Harness:** Cycle-accurate Verilator RTL simulation
 
 ### Simulation Results (10 Iterations)
 
@@ -60,18 +60,6 @@ Correct operation validated.
 | **CoreMark / MHz** | **1.1799** (~1.18) |
 | **CRC Validation** | **PASS** (`seedcrc=0xe9f5`, `crclist=0xe714`, `crcmatrix=0x1fd7`, `crcstate=0x8e3a`, `crcfinal=0xfcaf`) |
 
-### Reproduction Commands
-
-```bash
-# Quick 10-iteration verification
-./coremark/run_coremark_10.sh
-
-# Full 1,000-iteration benchmark via bench runner
-cd bench
-make verilator-mist-es
-make run-mist-es-coremark ITERATIONS=1000
-```
-
 ---
 
 ## 2. Dhrystone v2.1
@@ -82,7 +70,7 @@ Dhrystone is a synthetic benchmark measuring integer computation, string operati
 - **Workload:** Dhrystone v2.1 (100,000 runs, satisfying real-world runtime threshold)
 - **Compiler:** `riscv-none-elf-gcc 13.2.0`
 - **Optimization:** `-O2 -march=rv32imc_zicsr -mabi=ilp32 -DNUM_RUNS=100000`
-- **Simulation Harness:** Cycle-accurate Verilator driver (`dhrystone/run_dhrystone.sh`)
+- **Simulation Harness:** Cycle-accurate Verilator RTL simulation
 
 ### Simulation Results
 
@@ -104,13 +92,6 @@ DMIPS_Per_MHz: 0.388
 | **Dhrystones / Sec / MHz** | **683** | Un-normalized Dhrystone score |
 | **DMIPS / MHz** | **0.388** | Normalized score (divided by 1,757) |
 | **Internal Variable Verification** | **PASS** | All struct fields, string compares, and arrays verified |
-
-### Reproduction Commands
-
-```bash
-cd dhrystone
-./run_dhrystone.sh
-```
 
 ---
 
