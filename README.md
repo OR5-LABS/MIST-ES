@@ -12,7 +12,7 @@
 
 </div>
 
-A compact, fully verified **RV32IMC** processor core in synthesizable SystemVerilog. Built around a deterministic multi-cycle state machine with zero pipeline or hazard overhead, it targets embedded control planes, secure boot ROMs, safety-critical subsystems, and resource-constrained FPGA soft-cores.
+A compact, **RV32IMC** core written in SystemVerilog. Built around a deterministic multi-cycle state machine with zero pipeline or hazard overhead, it targets embedded control planes, secure boot ROMs, safety-critical subsystems, and resource-constrained FPGA soft-cores.
 
 ![diagram](diagram.svg)
 
@@ -29,8 +29,7 @@ A compact, fully verified **RV32IMC** processor core in synthesizable SystemVeri
 | **Reliability** | SECDED (39, 32) ECC-protected register file (`SECURE` build) |
 | **Bus Interfaces** | Native memory port + AXI4-Lite master/slave bridge |
 | **Debug** | RISC-V External Debug via JTAG (debug spec 0.13, DTM + DM) |
-| **Arch Compliance** | Official RISC-V Architectural Test Suite (`riscv-arch-test`) + `riscv-tests` |
-| **Target FPGA** | Digilent Arty A7-100T (xc7a100tcsg324-1) |
+| **Target FPGA** | Digilent Arty A7-100T |
 
 ---
 
@@ -49,7 +48,7 @@ A compact, fully verified **RV32IMC** processor core in synthesizable SystemVeri
 
 ## Resource Utilization
 
-Synthesized and implemented with **AMD Vivado 2023.2** targeting the **Digilent Arty A7-100T** (`xc7a100tcsg324-1`) evaluation board.
+Synthesized and implemented using **AMD Vivado 2023.2** targeting the **Arty A7-100T** (`xc7a100tcsg324-1`) evaluation board.
 
 | Configuration | LUTs | BRAM | DSP |
 | :--- | :---: | :---: | :---: |
@@ -60,12 +59,12 @@ Synthesized and implemented with **AMD Vivado 2023.2** targeting the **Digilent 
 
 ## Benchmark Metrics
 
-Measured in cycle-accurate Verilator simulation compiled with `riscv-none-elf-gcc -O2 -march=rv32imc_zicsr -mabi=ilp32`.
+Measured on FPGA  **Arty A7-100T**. 
 
-| Benchmark | Simulation (Verilator) |
+| Benchmark | FPGA (Arty A7-100T @ 50 MHz) |
 | :--- | :--- |
-| **CoreMark 1.0** (1,000 iterations) | **1.18 CoreMark/MHz** (847,547.1 cycles/iter, CRC Validated) |
-| **Dhrystone 2.1** (100,000 runs) | **0.388 DMIPS/MHz** (CPI = 2.973, 683 Dhrystones/sec/MHz) |
+| **CoreMark 1.0** (1,000 iter) | **1.18 CoreMark/MHz** |
+| **Dhrystone 2.1** (100,000 runs) | **0.388 DMIPS/MHz**|
 
 Detailed results, compiler flags, and methodology: **[benchmark.md](benchmark.md)**
 
@@ -119,7 +118,7 @@ make help         # list all targets
 
 Every action exits non-zero if the testbench reports `FAIL`, `TIMEOUT`, `MISMATCH`, or does not print its `PASS` verdict.
 
-Full pass/fail results, logs, and per-test details: **[tests.md](tests.md)**.
+For in depth results and per-test details: **[tests.md](tests.md)**.
 
 ---
 
