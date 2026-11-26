@@ -61,25 +61,8 @@ sw/fpga_hello.elf
 sw/vivado*
 *.rpt
 
-# Bench build outputs
-bench/build/
-bench/results/
-bench/*.fst*
-bench/*.log
-bench/.venv/
-bench/venv/
-
-# Verification toolchains and tools
-
-# dhrystone build
-dhrystone/build/
-
 # firmware
 sw/firmware.mem
 
-# test benchmarks
-benchmarks/coremark_sim.log
-
-# test runner outputs (run_tests.sh, run_isa.sh)
+# test runner outputs (tests/run_tests.sh)
 /build/
-third_party/riscv-arch-test/

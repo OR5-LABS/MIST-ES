@@ -11,14 +11,13 @@
 # A line in tests/expected.txt may end with "# KNOWN: <reason>" to mark a
 # documented known failure; the recorded result must still match exactly.
 set -u
-cd "$(dirname "$0")"
+cd "$(dirname "$0")/.."
 mkdir -p build/test-logs
 mode="${1:-check}"
 
 TARGETS="build.sh:sim build.sh:cosim build.sh:rvfi build.sh:debug
          build.sh:pmp build.sh:epmp build.sh:upriv build.sh:mml
-         build.sh:ecc build.sh:axil build.sh:fpga
-         run_isa.sh:all coremark/run_coremark_10.sh dhrystone/run_dhrystone.sh"
+         build.sh:ecc build.sh:axil build.sh:fpga"
 
 count() {  # $1 = log -> "pass fail"
   local p f

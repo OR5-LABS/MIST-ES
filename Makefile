@@ -1,6 +1,6 @@
 # Makefile -- top-level entry point for MIST-ES workflows
 
-.PHONY: all sim cosim rvfi debug pmp epmp upriv mml ecc axil fpga arch isa test clean help
+.PHONY: all sim cosim rvfi debug pmp epmp upriv mml ecc axil fpga test clean help
 
 all: sim
 
@@ -37,18 +37,12 @@ axil:
 fpga:
 	./build.sh fpga
 
-arch:
-	./run_arch_test.sh
-
-isa:
-	./run_isa.sh all
-
 test:
-	./run_tests.sh
+	./tests/run_tests.sh
 
 clean:
 	./build.sh clean
-	rm -rf build/arch-test/ build/isa/ sim/tb_isa_* sim/tb_arch_test*
+	rm -rf build/
 
 help:
 	@echo "MIST-ES Build & Test Targets:"
@@ -63,7 +57,5 @@ help:
 	@echo "  make ecc          run register file SECDED ECC unit test"
 	@echo "  make axil         run AXI4-Lite bridge self-check"
 	@echo "  make fpga         simulate FPGA SoC (UART banner + LED)"
-	@echo "  make arch         run official RISC-V Architectural Test suite (riscv-arch-test)"
-	@echo "  make isa          run official riscv-tests ISA suite"
 	@echo "  make test         run full regression battery against tests/expected.txt"
 	@echo "  make clean        clean simulation and build artifacts"

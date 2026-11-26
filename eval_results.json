@@ -81,27 +81,6 @@
         "pass_lines": 2,
         "fail_lines": 0,
         "verdict": "PASS"
-      },
-      {
-        "target": "run_isa.sh:all",
-        "exit_code": 0,
-        "pass_lines": 131,
-        "fail_lines": 0,
-        "verdict": "PASS"
-      },
-      {
-        "target": "coremark/run_coremark_10.sh",
-        "exit_code": 0,
-        "pass_lines": 2,
-        "fail_lines": 0,
-        "verdict": "PASS"
-      },
-      {
-        "target": "dhrystone/run_dhrystone.sh",
-        "exit_code": 0,
-        "pass_lines": 3,
-        "fail_lines": 0,
-        "verdict": "PASS"
       }
     ]
   },

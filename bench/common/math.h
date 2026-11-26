@@ -1,5 +1,0 @@
-#ifndef _MATH_H_
-#define _MATH_H_
-double fabs(double x);
-long sqrt(long x);
-#endif

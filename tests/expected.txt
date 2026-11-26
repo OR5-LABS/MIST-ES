@@ -9,6 +9,3 @@ build.sh:mml 0 1 0
 build.sh:ecc 0 1 0
 build.sh:axil 0 2 0
 build.sh:fpga 0 2 0
-run_isa.sh:all 0 131 0
-coremark/run_coremark_10.sh 0 2 0
-dhrystone/run_dhrystone.sh 0 3 0

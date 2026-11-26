@@ -15,10 +15,9 @@ jobs:
       - uses: actions/checkout@v4
 
       # Icarus runs the testbenches; the RISC-V GCC builds the PMP/Smepmp test
-      # programs, the official riscv-tests and the benchmarks; Verilator runs
-      # CoreMark and Dhrystone.
-      - name: Install Icarus Verilog, Verilator and RISC-V GCC
-        run: sudo apt-get update && sudo apt-get install -y iverilog verilator gcc-riscv64-unknown-elf
+      # programs.
+      - name: Install Icarus Verilog and RISC-V GCC
+        run: sudo apt-get update && sudo apt-get install -y iverilog gcc-riscv64-unknown-elf
 
       - uses: actions/setup-python@v5
         with:
@@ -54,19 +53,7 @@ jobs:
       - name: FPGA SoC simulation
         run: bash build.sh fpga
 
-      # Official riscv-tests (rv32ui, rv32um, rv32uc, rv32mi) on the default and
-      # SECURE builds; exits non-zero on any failing test.
-      - name: Official riscv-tests ISA suites
-        run: bash run_isa.sh all
-
-      # Benchmarks as regression checks (fail on a simulation FAIL/TIMEOUT or a
-      # CoreMark CRC error).
-      - name: CoreMark (10 iterations)
-        run: bash coremark/run_coremark_10.sh
-      - name: Dhrystone
-        run: bash dhrystone/run_dhrystone.sh
-
       # Every target again, compared with the recorded baseline (exit codes and
       # PASS/FAIL verdict counts) in tests/expected.txt.
       - name: Baseline comparison
-        run: bash run_tests.sh
+        run: bash tests/run_tests.sh

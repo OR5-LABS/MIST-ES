@@ -2,7 +2,7 @@
 # ============================================================================
 # build.sh — build & run MIST-ES under Icarus Verilog.
 #
-#   ./build.sh [sim|cosim|rvfi|debug|pmp|epmp|upriv|mml|ecc|axil|fpga|bench|clean]
+#   ./build.sh [sim|cosim|rvfi|debug|pmp|epmp|upriv|mml|ecc|axil|fpga|clean]
 #
 #   sim    (default) compile the core + SoC and run the self-checking smoke test
 #   cosim  run smoke, then co-simulate against the golden RV32IM ISA model
@@ -107,8 +107,11 @@ if [[ "$ACTION" == "pmp" || "$ACTION" == "epmp" || "$ACTION" == "upriv" || "$ACT
     fi
     "$OBJCOPY" -O binary -j .text "programs/build/${HEXNAME}.elf" "programs/build/${HEXNAME}.bin"
     python3 sw/bin2hex.py "programs/build/${HEXNAME}.bin" "programs/build/${HEXNAME}.hex"
-  else
+  elif [[ -f "programs/build/${HEXNAME}.hex" ]]; then
     echo "No RISC-V toolchain found; using prebuilt programs/build/${HEXNAME}.hex."
+  else
+    echo "ERROR: No RISC-V toolchain found (set RISCV_TC) and prebuilt programs/build/${HEXNAME}.hex is missing." >&2
+    exit 1
   fi
   echo "Building MIST-ES SECURE sim (U-mode + PMP + ePMP + regfile ECC)..."
   "$IVL" -g2012 -DMIST_ES_SECURE -I "$C" -I "$R" -o sim/tb_mist_es \
@@ -151,21 +154,6 @@ if [[ "$ACTION" == "debug" ]]; then
     $CELLS $CORE tb/tb_mist_es_debug.sv
   "$VVP" sim/tb_mist_es_debug +IMEM=programs/build/smoke.hex | tee sim/debug.log
   check_verdict debug sim/debug.log '^DEBUG: PASS'
-fi
-
-# ---- Verilator benchmark suite (CoreMark) -------------------
-if [[ "$ACTION" == "bench" ]]; then
-  echo "Running MIST-ES benchmark suite (CoreMark)..."
-  echo "  Verilator model + CoreMark will be compiled and simulated."
-  echo "  Results will appear in bench/results/report.md"
-  echo ""
-  if [[ -n "${RISCV_TC:-}" ]]; then
-    export PATH="$RISCV_TC:$PATH"
-  fi
-  make -C "$(dirname "$0")/bench" all \
-    ${ITERATIONS:+ITERATIONS="$ITERATIONS"} \
-    ${SCALE:+SCALE="$SCALE"}
-  exit 0
 fi
 
 # ---- AXI4-Lite bus integration self-check --------------------------------

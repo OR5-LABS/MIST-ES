@@ -18,7 +18,6 @@
 //
 // After bitstream is loaded:
 //   openFPGALoader -b arty_a7_100t mist_es_arty_a7.bit
-//   python3 sw/run_hil_bench.py --port /dev/ttyUSB1 --freq 50 --bench coremark --no-flash
 // ============================================================================
 `default_nettype none
 

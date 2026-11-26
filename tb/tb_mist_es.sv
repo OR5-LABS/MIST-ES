@@ -7,9 +7,8 @@
 //   vvp sim/tb_mist_es +IMEM=... +MAXCYC=<n>  (cycle limit, default 200000)
 //   vvp sim/tb_mist_es +IMEM=... +IMEM_WRITABLE
 //       testbench memory model only: data stores into the IMEM window also
-//       update IMEM (the SoC's IMEM is fetch + read-only data). run_isa.sh uses
-//       it because riscv-tests expect one read/write memory (rv32uc/rvc stores
-//       into data placed in its own code section).
+//       update IMEM (the SoC's IMEM is fetch + read-only data), for programs
+//       that expect unified read/write memory.
 //
 // Exit protocol: a store to tohost (0x2000_0000) ends the run.
 //   tohost == 1  -> PASS
