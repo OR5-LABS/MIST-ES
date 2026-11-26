@@ -51,10 +51,10 @@ A compact, fully verified **RV32IMC** processor core in synthesizable SystemVeri
 
 Synthesized and implemented with **AMD Vivado 2023.2** targeting the **Digilent Arty A7-100T** (`xc7a100tcsg324-1`) evaluation board.
 
-| Configuration | LUT | DSP | BRAM |
+| Configuration | LUTs | BRAM | DSP |
 | :--- | :---: | :---: | :---: |
-| **MIST-ES Core (Default RV32IMC)** | 2,611 | 4 | 0 |
-
+| **Default** (`RV32IMC`, M-mode) | 2,611 | 0 | 4 |
+| **SECURE** (`M+U`, 8-region PMP/Smepmp, ECC) | 4,980 | 0 | 4 |
 
 ---
 
@@ -66,7 +66,6 @@ Measured in cycle-accurate Verilator simulation compiled with `riscv-none-elf-gc
 | :--- | :--- | :--- |
 | **CoreMark 1.0** (1,000 iterations) | **1.18 CoreMark/MHz** (847,547.1 cycles/iter, CRC Validated) | **1.18 CoreMark/MHz** (59.0 CoreMark) |
 | **Dhrystone 2.1** (100,000 runs) | **0.388 DMIPS/MHz** (CPI = 2.973, 683 Dhrystones/sec/MHz) | **0.388 DMIPS/MHz** (19.40 DMIPS) |
-
 
 Detailed results, compiler flags, and methodology: **[benchmark.md](benchmark.md)**
 
@@ -119,6 +118,7 @@ make help         # list all targets
 ```
 
 Every action exits non-zero if the testbench reports `FAIL`, `TIMEOUT`, `MISMATCH`, or does not print its `PASS` verdict.
+
 Full pass/fail results, logs, and per-test details: **[tests.md](tests.md)**.
 
 ---

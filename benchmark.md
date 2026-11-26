@@ -28,7 +28,7 @@ CoreMark tests core pipeline, memory access, integer ALU, and control-logic effi
 - **Workload:** EEMBC CoreMark v1.0
 - **Compiler:** `riscv-none-elf-gcc (xPack GNU RISC-V Embedded GCC) 13.2.0`
 - **Optimization:** `-O2 -march=rv32imc_zicsr -mabi=ilp32`
-- **Memory Allocation:** Static allocation (`MEM_METHOD=MEM_STATIC`), Harvard architecture (`bench.ld`)
+- **Memory Allocation:** Static allocation (`MEM_METHOD=MEM_STATIC`), Harvard architecture (separate IMEM/DRAM)
 - **Simulation Harness:** Cycle-accurate Verilator RTL simulation
 
 ### Simulation Results (10 Iterations)

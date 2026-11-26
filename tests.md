@@ -1,12 +1,12 @@
 # Verification & Test Report — MIST-ES
 
-**Core Identity:** MIST-ES — Enterprise Secure Embedded Processor Core with Multi-Mode PMP & ePMP  
-**Target Architecture:** `RV32IMC + Zicsr + PMP + ePMP + Smepmp`  
-**Pipeline Microarchitecture:** 4-Stage In-Order Secure Pipeline with Hardware Security Subsystems and Physical Memory Protection  
+**Core Identity:** MIST-ES — Area-Optimized Secure Multi-Cycle RISC-V Processor Core  
+**Target Architecture:** `RV32IMC + Zicsr` (with optional `SECURE` mode: User mode, 8-region PMP + Smepmp, SECDED ECC)  
+**Microarchitecture:** Non-Pipelined Multi-Cycle Deterministic FSM (`S_FETCH` → `S_EXEC` → `{S_LOAD | S_STORE | S_MD}` → `S_FETCH`)  
 **Target FPGA Platform:** Digilent Arty A7-100T (`xc7a100tcsg324-1`)  
-**Sign-Off Standards:** Official RISC-V Architectural Compliance (`riscv-tests` / `riscv-arch-test`), RISC-V Formal Interface (RVFI), DO-254 / ISO 26262 ASIL-D Verification Baseline  
+**Sign-Off Standards:** Official RISC-V Architectural Compliance (`riscv-tests` / `riscv-arch-test`), RISC-V Formal Interface (RVFI)  
 **Verification Harness:** Automated deterministic regression via `./tests/run_tests.sh` (tracked in `tests/expected.txt`)  
-**Overall Verification Verdict:** **100% PASS** (All regression targets, upstream ISA tests, CoreMark, and Dhrystone validated with authentic physical measurements)  
+**Overall Verification Verdict:** **PASS** (Core/SoC/security regression targets, recorded ISA compliance suites, CoreMark, and Dhrystone validated)  
 
 ---
 
@@ -14,13 +14,13 @@
 
 | Verification Domain | Testing Requirement | Methodology / Tool | Pass / Fail Criteria | Verification Status |
 | :--- | :--- | :--- | :--- | :---: |
-| **Microarchitecture** | Exact instruction decode and execution without illegal traps on valid instructions; trap `mcause=2` on unsupported opcodes. | Verilator / Icarus Verilog RTL simulation | Zero pipeline bubbles on bypassable paths; deterministic retirement across all states; zero structural deadlocks. | **PASS** |
-| **Instruction Latency** | Cycle latency must equal specified pipeline budget (+/- 0.00 cyc variance under 0-wait memory). | Cycle-accurate RTL trace inspection | Integer ALU=1 cyc, RAW chain bypassed=1 cyc, Branches=1 cyc (not taken), Loads=1 cyc. | **PASS** |
+| **Microarchitecture** | Exact instruction decode and execution without illegal traps on valid instructions; trap `mcause=2` on unsupported opcodes. | Icarus Verilog RTL simulation + Python golden co-sim | Deterministic multi-cycle FSM retirement across all states; zero structural deadlocks. | **PASS** |
+| **Instruction Latency** | Cycle latency must equal specified multi-cycle FSM budget under 0-wait memory. | Cycle-accurate RTL trace inspection | ALU/Branch/Store=2 cyc, Load=3 cyc, Mul/Div=34 cyc (exact FSM determinism). | **PASS** |
 | **Architectural Compliance** | 100% compliance against ratified RISC-V specifications. | Official upstream `riscv-tests` and `riscv-arch-test` suites | Pass 100% of executed test signatures; exact architectural register state match against golden models. | **PASS** |
-| **Formal Trace Invariants** | Step-by-step verification of architectural register and PC updates upon retirement. | Native RISC-V Formal Interface (RVFI) monitor | Formal proof / continuous assertion of zero architectural divergence or hidden state bugs. | **PASS** |
-| **In-System Run-Control** | Halt, single-step, resume, and inspect registers/memory via standard debugger without bus freeze. | RISC-V Debug Module (0.13) DTM/DM simulation | GDB attaches cleanly via JTAG OpenOCD; all abstract commands succeed without timeout. | **PASS** |
-| **Fault Injection & Safety** | Engineered faults and negative controls must be detected and trapped reliably without silent data corruption. | Directed fault injection testbenches | 100% defect capture rate; precise exception trap vectoring (`mcause=1, 2, 5, or 7`). | **PASS** |
-| **FPGA Implementation** | Logic utilization and timing closure within platform resource budget on Xilinx Artix-7 100T. | Vivado / synthesis characterization | Clean timing closure at target frequency; LUT, FF, DSP, and BRAM allocation conforms to datasheet budget. | **PASS** |
+| **Formal Trace Invariants** | Step-by-step verification of architectural register and PC updates upon retirement. | Native RISC-V Formal Interface (RVFI) monitor | Continuous assertion of zero architectural divergence or hidden state bugs. | **PASS** |
+| **In-System Run-Control** | Halt, single-step, resume, and inspect registers/memory via JTAG debugger without bus freeze. | RISC-V Debug Module (0.13) DTM/DM testbench | All JTAG DTM + DM halt, register/CSR, bus access, resume, and single-step checks pass. | **PASS** |
+| **Fault Injection & Safety** | Engineered faults and negative controls must be detected and trapped reliably without silent data corruption. | Directed fault injection & PMP/ECC testbenches | 100% defect capture rate; SECDED ECC correction/detection and precise exception traps (`mcause=1, 2, 5, or 7`). | **PASS** |
+| **FPGA Implementation** | Logic utilization and timing closure within platform resource budget on Xilinx Artix-7 100T. | Vivado 2023.2 synthesis & implementation | Clean timing closure at 50 MHz; LUT, DSP, and BRAM allocation conforms to budget. | **PASS** |
 
 ---
 
@@ -30,17 +30,17 @@ The core repository includes an automated regression harness (`./tests/run_tests
 
 | Test Target / Script | Testing Requirement | What It Tests | Observed Result / Values | Exit Code | Status |
 | :--- | :--- | :--- | :--- | :---: | :---: |
-| `build.sh:sim` | **Core RTL Bring-Up & Smoke Assembly** | Executes bring-up program exercising ALU, control flow, register file access, memory transactions, and trap handling. | 1 PASS line(s) | `0` | **PASS** |
-| `build.sh:cosim` | **Core RTL Bring-Up & Smoke Assembly** | Executes bring-up program exercising ALU, control flow, register file access, memory transactions, and trap handling. | 1 PASS line(s) | `0` | **PASS** |
-| `build.sh:rvfi` | **Core RTL Bring-Up & Smoke Assembly** | Executes bring-up program exercising ALU, control flow, register file access, memory transactions, and trap handling. | 2 PASS line(s) | `0` | **PASS** |
-| `build.sh:debug` | **Core RTL Bring-Up & Smoke Assembly** | Executes bring-up program exercising ALU, control flow, register file access, memory transactions, and trap handling. | 2 PASS line(s) | `0` | **PASS** |
-| `build.sh:pmp` | **Core RTL Bring-Up & Smoke Assembly** | Executes bring-up program exercising ALU, control flow, register file access, memory transactions, and trap handling. | 1 PASS line(s) | `0` | **PASS** |
-| `build.sh:epmp` | **Core RTL Bring-Up & Smoke Assembly** | Executes bring-up program exercising ALU, control flow, register file access, memory transactions, and trap handling. | 1 PASS line(s) | `0` | **PASS** |
-| `build.sh:upriv` | **Core RTL Bring-Up & Smoke Assembly** | Executes bring-up program exercising ALU, control flow, register file access, memory transactions, and trap handling. | 1 PASS line(s) | `0` | **PASS** |
-| `build.sh:mml` | **Core RTL Bring-Up & Smoke Assembly** | Executes bring-up program exercising ALU, control flow, register file access, memory transactions, and trap handling. | 1 PASS line(s) | `0` | **PASS** |
-| `build.sh:ecc` | **Core RTL Bring-Up & Smoke Assembly** | Executes bring-up program exercising ALU, control flow, register file access, memory transactions, and trap handling. | 1 PASS line(s) | `0` | **PASS** |
-| `build.sh:axil` | **Core RTL Bring-Up & Smoke Assembly** | Executes bring-up program exercising ALU, control flow, register file access, memory transactions, and trap handling. | 2 PASS line(s) | `0` | **PASS** |
-| `build.sh:fpga` | **Core RTL Bring-Up & Smoke Assembly** | Executes bring-up program exercising ALU, control flow, register file access, memory transactions, and trap handling. | 2 PASS line(s) | `0` | **PASS** |
+| `build.sh:sim` | **Core RTL Bring-Up & Smoke Test** | Executes self-checking RV32IM smoke test exercising ALU, MulDiv, branches, loads/stores, CSR, and trap handling. | 1 PASS line(s) | `0` | **PASS** |
+| `build.sh:cosim` | **Golden ISA Co-Simulation** | Diffs RTL retire trace instruction-by-instruction against the golden Python RV32IM model (`tools/cosim.py`). | 1 PASS line(s) | `0` | **PASS** |
+| `build.sh:rvfi` | **RISC-V Formal Interface Check** | Validates RVFI instruction-level commit trace without protocol or state violations (`tb_mist_es_rvfi.sv`). | 2 PASS line(s) | `0` | **PASS** |
+| `build.sh:debug` | **JTAG DTM & Debug Module** | Tests halt, register/CSR inspection, system-bus memory read/write, resume, and single-step (`tb_mist_es_debug.sv`). | 2 PASS line(s) | `0` | **PASS** |
+| `build.sh:pmp` | **SECURE: U-Mode & PMP** | Exercises 8-region PMP enforcement with User mode (`mstatus.MPP = 0`) and access fault trapping. | 1 PASS line(s) | `0` | **PASS** |
+| `build.sh:epmp` | **SECURE: Smepmp MMWP Rules** | Exercises Enhanced PMP Machine Mode Whitelist Policy (`mseccfg.MMWP`) default-deny enforcement. | 1 PASS line(s) | `0` | **PASS** |
+| `build.sh:upriv` | **SECURE: U-Mode Privilege Isolation** | Verifies Machine CSR and `MRET` execution from U-mode raise illegal-instruction traps. | 1 PASS line(s) | `0` | **PASS** |
+| `build.sh:mml` | **SECURE: Smepmp Machine Lockdown** | Exercises Machine Mode Lockdown (`mseccfg.MML`) permission rules, `pmpcfg`, and `RLB` behavior. | 1 PASS line(s) | `0` | **PASS** |
+| `build.sh:ecc` | **Register File SECDED ECC** | Unit-tests Hamming (39, 32) single-bit error correction and double-bit error detection (`tb_regfile_ecc.sv`). | 1 PASS line(s) | `0` | **PASS** |
+| `build.sh:axil` | **AXI4-Lite Bridge Self-Check** | Validates multi-cycle memory to AXI4-Lite protocol conversion with wait states (`tb_mist_es_axil.sv`). | 2 PASS line(s) | `0` | **PASS** |
+| `build.sh:fpga` | **FPGA SoC Simulation** | Simulates board-level FPGA SoC wrapper with 115200 baud UART banner and LED blink (`tb_mist_es_fpga.sv`). | 2 PASS line(s) | `0` | **PASS** |
 
 ---
 
@@ -109,40 +109,35 @@ All performance numbers reported below represent **100% authentic, measured exec
 
 ---
 
-## 5. Per-Instruction Latencies & Pipeline Hazard Budgets
+## 5. Per-Instruction Latencies & Multi-Cycle FSM Timing
 
-| Instruction / Hazard Category | Architectural Latency Budget | Observed Execution Latency | Bypass / Resolution Mechanism | Status |
-| :--- | :--- | :--- | :--- | :---: |
-| **Integer ALU & Shifts** | `1.00 cyc` (0.50 cyc dual-issue if superscalar) | `1.00 cyc` | Single-cycle execution datapath | **PASS** |
-| **RAW Dependent ALU Chain** | `1.00 cyc (Bypassed)` | `1.00 cyc` | Full WB->EX / MEM->EX operand forwarding | **PASS** |
-| **Upper Immediate (LUI, AUIPC)** | `1.00 cyc` | `1.00 cyc` | Single-cycle decode/execute datapath | **PASS** |
-| **Conditional Branch (Fall-Through)** | `1.00 cyc` | `1.00 cyc` | Zero-bubble fall-through execution | **PASS** |
-| **Conditional Branch (Taken)** | `1.00 - 2.00 cyc` | `1.00 - 2.00 cyc` | Pipeline squash and branch target redirection | **PASS** |
-| **Unconditional Jump (JAL, JALR)** | `1.00 - 2.00 cyc` | `1.00 - 2.00 cyc` | Direct target address calculation | **PASS** |
-| **Load Throughput (0-wait SRAM)** | `1.00 cyc` | `1.00 cyc` | Synchronous single-cycle memory interface | **PASS** |
-| **Load-Use Data Hazard** | `1.00 - 2.00 cyc` | `1.00 - 2.00 cyc` | Hardware interlock stall / forwarding bypass | **PASS** |
-| **Store Throughput** | `1.00 cyc` | `1.00 cyc` | Buffered non-blocking write interface | **PASS** |
-| **CSR Read / Write Access** | `1.00 - 2.00 cyc` | `1.00 - 2.00 cyc` | Direct CSR register file bypass | **PASS** |
-| **Hardware Multiplier** | `1.00 - 3.00 cyc (DSP backed)` | `1.00 - 3.00 cyc` | Dedicated hardware DSP multiplier | **PASS** |
-| **Hardware Divider / Remainder** | `32 - 64 cyc` | `32 - 64 cyc` | Radix-2 iterative division unit | **PASS** |
+| Instruction / Operation Category | FSM State Sequence | Observed Cycle Latency | Notes / Hardware Mechanism | Status |
+| :--- | :--- | :---: | :--- | :---: |
+| **Integer ALU & Shifts (R/I-type)** | `S_FETCH` → `S_EXEC` | `2 cyc` | Non-pipelined fetch + execute | **PASS** |
+| **Upper Immediate (`LUI`, `AUIPC`)** | `S_FETCH` → `S_EXEC` | `2 cyc` | Single execute beat | **PASS** |
+| **Conditional Branch (Taken / Not Taken)** | `S_FETCH` → `S_EXEC` | `2 cyc` | Zero branch-prediction or flush penalty | **PASS** |
+| **Unconditional Jump (`JAL`, `JALR`)** | `S_FETCH` → `S_EXEC` | `2 cyc` | Direct target PC update in `S_EXEC` | **PASS** |
+| **Load (`LW`, `LH`, `LB`, aligned)** | `S_FETCH` → `S_EXEC` → `S_LOAD` | `3 cyc` | `+1 cyc` (`S_LOAD2`) if crossing word boundary | **PASS** |
+| **Store (`SW`, `SH`, `SB`, aligned)** | `S_FETCH` → `S_EXEC` | `2 cyc` | `+1 cyc` (`S_STORE2`) if crossing word boundary | **PASS** |
+| **CSR Read / Write (`Zicsr`)** | `S_FETCH` → `S_EXEC` | `2 cyc` | Direct CSR update and writeback in `S_EXEC` | **PASS** |
+| **Hardware Multiply / Divide (`RV32M`)** | `S_FETCH` → `S_EXEC` → `S_MD` | `34 cyc` | Iterative 32-cycle serial `mist_es_muldiv` engine | **PASS** |
+| **Unaligned 32-bit RVI Fetch** | `+S_FETCH2` | `+1 cyc` | Hardware two-beat fetch for halfword-aligned 32-bit opcodes | **PASS** |
 
-### Microarchitectural Disclosures & Pipeline Hazards
+### Microarchitectural Disclosures
 
-- **Pipeline Forwarding & Hazards:** PMP permission checking on all fetch, load, and store operations in parallel with address generation.
+- **Zero Forwarding / Hazard Stalls:** Because instructions execute sequentially across multi-cycle FSM states, there are no pipeline hazards, forwarding paths, or speculative flushes.
+- **PMP Checking:** In `SECURE` mode, PMP permission checks run in parallel during `S_EXEC` for fetch, load, and store addresses.
 
 ---
 
 ## 6. Physical FPGA Implementation & Resource Characterization (Digilent Arty A7-100T)
 
-Synthesized and characterized with **AMD Vivado** targeting the **Digilent Arty A7-100T** FPGA (`xc7a100tcsg324-1`):
+Synthesized and implemented with **AMD Vivado 2023.2** targeting the **Digilent Arty A7-100T** FPGA (`xc7a100tcsg324-1`):
 
-| Resource Metric | Hardware Allocation | Utilization Details | Sign-Off Status |
-| :--- | :---: | :--- | :---: |
-| **Slice LUTs** | **4,980** | 4,890 Logic, 90 Memory LUTs / LUTRAM | **PASS** |
-| **Flip-Flops (Registers)** | **1,890** | Dedicated sequential registers | **PASS** |
-| **DSP Slices (DSP48E1)** | **4** | Dedicated DSP hardware multiply/accumulate blocks | **PASS** |
-| **Block RAM (BRAM)** | **0** | Embedded Block RAM allocation | **PASS** |
-| **Total LUT Utilization** | **7.9%** | Percentage of available Artix-7 100T resources | **PASS** |
+| Configuration | LUTs | BRAM | DSP | Sign-Off Status |
+| :--- | :---: | :---: | :---: | :---: |
+| **Default** (`RV32IMC`, M-mode) | **2,611** | **0** | **4** | **PASS** |
+| **SECURE** (`M+U`, 8-region PMP/Smepmp, ECC) | **4,980** | **0** | **4** | **PASS** |
 
 ---
 
@@ -167,7 +162,7 @@ Structural code coverage is measured using **Verilator 5.020** with full line an
 | **Immediate Generator** | [`mist_es_immgen.sv`](rtl/common/mist_es_immgen.sv) | 6 | 5 | **83.33%** | **PASS** |
 | **Hardware Multiplier / Divider** | [`mist_es_muldiv.sv`](rtl/common/mist_es_muldiv.sv) | 94 | 77 | **81.91%** | **PASS** |
 | **Instruction Decoder** | [`mist_es_decode.sv`](rtl/common/mist_es_decode.sv) | 100 | 80 | **80.00%** | **PASS** |
-| **Pipeline Core Datapath** | [`mist_es_core.sv`](rtl/mist_es_core.sv) | 203 | 130 | **64.04%** | **PASS** |
+| **Core Datapath & Multi-Cycle FSM** | [`mist_es_core.sv`](rtl/mist_es_core.sv) | 203 | 130 | **64.04%** | **PASS** |
 | **Control & Status Registers** | [`mist_es_csr.sv`](rtl/common/mist_es_csr.sv) | 149 | 50 | **33.56%** | **PASS** |
 | **RISC-V Debug Module (0.13)** | [`mist_es_debug.sv`](rtl/mist_es_debug.sv) | 205 | 33 | **16.10%** | **PASS** |
 | **Verification Harness Top** | `bench_top.sv` | 81 | 55 | **67.90%** | **PASS** |
