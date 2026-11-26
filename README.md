@@ -60,12 +60,12 @@ Synthesized and implemented with **AMD Vivado 2023.2** targeting the **Digilent 
 
 ## Benchmark Metrics
 
-Measured in cycle-accurate Verilator simulation compiled with `riscv-none-elf-gcc -O2 -march=rv32imc_zicsr -mabi=ilp32` and bare-metal execution on physical FPGA silicon targeting the **Digilent Arty A7-100T** (`xc7a100tcsg324-1`).
+Measured in cycle-accurate Verilator simulation compiled with `riscv-none-elf-gcc -O2 -march=rv32imc_zicsr -mabi=ilp32`.
 
-| Benchmark | Simulation (Verilator) | FPGA (Arty A7-100T @ 50 MHz) |
-| :--- | :--- | :--- |
-| **CoreMark 1.0** (1,000 iterations) | **1.18 CoreMark/MHz** (847,547.1 cycles/iter, CRC Validated) | **1.18 CoreMark/MHz** (59.0 CoreMark) |
-| **Dhrystone 2.1** (100,000 runs) | **0.388 DMIPS/MHz** (CPI = 2.973, 683 Dhrystones/sec/MHz) | **0.388 DMIPS/MHz** (19.40 DMIPS) |
+| Benchmark | Simulation (Verilator) |
+| :--- | :--- |
+| **CoreMark 1.0** (1,000 iterations) | **1.18 CoreMark/MHz** (847,547.1 cycles/iter, CRC Validated) |
+| **Dhrystone 2.1** (100,000 runs) | **0.388 DMIPS/MHz** (CPI = 2.973, 683 Dhrystones/sec/MHz) |
 
 Detailed results, compiler flags, and methodology: **[benchmark.md](benchmark.md)**
 
