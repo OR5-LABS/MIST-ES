@@ -4,9 +4,9 @@
 **Target Architecture:** `RV32IMC + Zicsr` (with optional `SECURE` mode: User mode, 8-region PMP + Smepmp, SECDED ECC)  
 **Microarchitecture:** Non-Pipelined Multi-Cycle Deterministic FSM (`S_FETCH` → `S_EXEC` → `{S_LOAD | S_STORE | S_MD}` → `S_FETCH`)  
 **Target FPGA Platform:** Digilent Arty A7-100T (`xc7a100tcsg324-1`)  
-**Sign-Off Standards:** Official RISC-V Architectural Compliance (`riscv-tests` / `riscv-arch-test`), RISC-V Formal Interface (RVFI)  
+**Verification References:** `riscv-tests`, `riscv-arch-test` v2.7.4 and an RVFI trace monitor  
 **Verification Harness:** Automated deterministic regression via `./tests/run_tests.sh` (tracked in `tests/expected.txt`)  
-**Overall Verification Verdict:** **PASS** (Core/SoC/security regression targets, recorded ISA compliance suites, CoreMark, and Dhrystone validated)  
+**Overall Verification Verdict:** **PASS** (all regression targets, upstream ISA tests, `riscv-arch-test`, CoreMark and Dhrystone, measured in cycle-accurate RTL simulation)  
 
 ---
 
@@ -16,11 +16,11 @@
 | :--- | :--- | :--- | :--- | :---: |
 | **Microarchitecture** | Exact instruction decode and execution without illegal traps on valid instructions; trap `mcause=2` on unsupported opcodes. | Icarus Verilog RTL simulation + Python golden co-sim | Deterministic multi-cycle FSM retirement across all states; zero structural deadlocks. | **PASS** |
 | **Instruction Latency** | Cycle latency must equal specified multi-cycle FSM budget under 0-wait memory. | Cycle-accurate RTL trace inspection | ALU/Branch/Store=2 cyc, Load=3 cyc, Mul/Div=34 cyc (exact FSM determinism). | **PASS** |
-| **Architectural Compliance** | Compliance with the ratified RISC-V specifications. | Official upstream `riscv-tests` and `riscv-arch-test` suites | All executed test signatures pass; exact architectural register state match against golden models. | **PASS** |
-| **Formal Trace Invariants** | Step-by-step verification of architectural register and PC updates upon retirement. | Native RISC-V Formal Interface (RVFI) monitor | Continuous assertion of zero architectural divergence or hidden state bugs. | **PASS** |
-| **In-System Run-Control** | Halt, single-step, resume, and inspect registers/memory via JTAG debugger without bus freeze. | RISC-V Debug Module (0.13) DTM/DM testbench | All JTAG DTM + DM halt, register/CSR, bus access, resume, and single-step checks pass. | **PASS** |
-| **Fault Injection & Safety** | Engineered faults and negative controls must be detected and trapped reliably without silent data corruption. | Directed fault injection & PMP/ECC testbenches | All injected faults detected; SECDED ECC correction/detection and precise exception traps (`mcause=1, 2, 5, or 7`). | **PASS** |
-| **FPGA Implementation** | Logic utilization and timing closure within platform resource budget on Xilinx Artix-7 100T. | Vivado 2023.2 synthesis & implementation | Clean timing closure at 50 MHz; LUT, DSP, and BRAM allocation conforms to budget. | **PASS** |
+| **Architectural Compliance** | Compliance with the ratified RISC-V specifications. | Official upstream `riscv-tests` and `riscv-arch-test` v2.7.4 suites | Every executed test passes against the upstream reference signature (arch-test) or writes `1` to `tohost` (riscv-tests); skips and failures are listed in §3. | **PASS** |
+| **RVFI Trace Check** | Step-by-step verification of architectural register and PC updates upon retirement. | RISC-V Formal Interface (RVFI) trace monitor (simulation) | Continuous assertion over the RVFI retirement trace during simulation. No formal proof (riscv-formal / SymbiYosys) yet. | **PASS** |
+| **In-System Run-Control** | Halt, single-step, resume, and inspect registers/memory via JTAG debugger without bus freeze. | RISC-V Debug Module (0.13) DTM/DM testbench | Halt, resume, single-step, register/CSR and memory access checks pass in simulation. No OpenOCD/GDB session yet. | **PASS** |
+| **Negative Controls & Fault Injection** | Engineered faults and negative controls must be detected and trapped reliably without silent data corruption. | Directed fault injection & PMP/ECC testbenches | Each negative control is detected (corrupted test fails; protection violations trap with the expected `mcause`). | **PASS** |
+| **FPGA Resource Characterization** | Logic utilization within platform resource budget on Xilinx Artix-7 100T. | Vivado 2023.2 synthesis | Synthesis utilization (LUT, FF, DSP, BRAM) fits the target device. | **PASS** |
 
 ---
 
@@ -44,7 +44,7 @@ The core repository includes an automated regression harness (`./tests/run_tests
 
 ---
 
-## 3. Official RISC-V Architectural Compliance Suites (ISA Tests)
+## 3. RISC-V ISA and Architecture Test Suites
 
 MIST-ES is verified against both the official **RISC-V Architecture Test suite** (`riscv-arch-test`) and the official **Berkeley ISA suites** (`riscv-tests`).
 
@@ -84,6 +84,27 @@ Tests skipped by the test harness represent documented microarchitectural design
 | `rv32ui/fence_i` | Zifencei is not implemented: FENCE.I raises an illegal-instruction trap |
 | `rv32mi/pmpaddr` | test assumes PMP; the default build has none (runs on the SECURE build) |
 | `rv32ui/fence_i` | Zifencei is not implemented: FENCE.I raises an illegal-instruction trap |
+
+---
+
+### riscv-arch-test (v2.7.4)
+
+Official `riscv-arch-test` v2.7.4 (reference signatures from the upstream suite), run on the RTL in simulation. Run with `./build.sh arch` (or `make arch`) from the core directory; see `arch-test/README.md`. Suites run: I, M, C, privilege.
+
+| Suite | Executed | Passed | Failed | Skipped |
+| :--- | :---: | :---: | :---: | :---: |
+| I | 38 | 38 | 0 | 0 |
+| M | 8 | 8 | 0 | 0 |
+| C | 27 | 27 | 0 | 0 |
+| privilege | 16 | 16 | 0 | 0 |
+| **Total** | **89** | **89** | **0** | **0** |
+
+**Not run:** Zifencei (FENCE.I raises an illegal-instruction trap by design).
+
+**Not covered by this suite version:** A (atomics), B/Zb\*/Zcb and the custom extensions have no tests in riscv-arch-test v2.7.4 and are not covered by this suite version.
+
+- The five `misalign-*` load/store tests use the hardware-misaligned expected values.
+- I + M + C = 73 tests, the same set listed under the ISA-test section above.
 
 ---
 
@@ -132,18 +153,18 @@ All performance numbers reported below represent **measured execution values** e
 
 ## 6. Physical FPGA Implementation & Resource Characterization (Digilent Arty A7-100T)
 
-Synthesized and implemented with **AMD Vivado 2023.2** targeting the **Digilent Arty A7-100T** FPGA (`xc7a100tcsg324-1`):
+Synthesized with **AMD Vivado 2023.2** targeting the **Digilent Arty A7-100T** FPGA (`xc7a100tcsg324-1`):
 
-| Configuration | LUTs | BRAM | DSP | Sign-Off Status |
+| Configuration | LUTs | BRAM | DSP | Fits Target |
 | :--- | :---: | :---: | :---: | :---: |
 | **Default** (`RV32IMC`, M-mode) | **2,611** | **0** | **4** | **PASS** |
 | **SECURE** (`M+U`, 8-region PMP/Smepmp, ECC) | **4,980** | **0** | **4** | **PASS** |
 
 ---
 
-## 7. Deliberate Negative Controls & Defect Injection Sign-Off
+## 7. Negative Controls
 
-Production qualification requires proving that test harnesses actively detect bugs and faults rather than giving trivial passes. The following negative controls are executed and verified:
+Negative controls confirm that the test harnesses detect bugs and faults rather than passing trivially:
 
 - **Negative Control Verification:** Corrupted `rv32ui/add` test 2 caught with tohost=5. Multi-level privilege violation and ePMP lock-mode negative controls verified.
 
@@ -153,7 +174,7 @@ Production qualification requires proving that test harnesses actively detect bu
 
 Structural code coverage is measured using **Verilator 5.020** with full line and toggle instrumentation (`--coverage`). Coverage data was aggregated across functional execution, demonstrating deterministic activation of datapath leaves, decoders, and execution units:
 
-| Module / Datapath Component | Verilog Source File | Instrumented Lines | Covered Lines | Line Coverage % | Sign-Off Verdict |
+| Module / Datapath Component | Verilog Source File | Instrumented Lines | Covered Lines | Line Coverage % | Fits Target |
 | :--- | :--- | :---: | :---: | :---: | :---: |
 | **Branch Predictor & Compare** | [`mist_es_branch.sv`](rtl/common/mist_es_branch.sv) | 12 | 12 | **100.00%** | **PASS** |
 | **Arithmetic Logic Unit (ALU)** | [`mist_es_alu.sv`](rtl/common/mist_es_alu.sv) | 19 | 18 | **94.74%** | **PASS** |
@@ -172,7 +193,7 @@ Structural code coverage is measured using **Verilator 5.020** with full line an
 
 ---
 
-## 9. Official Industrial Baseline Sign-Off Reference
+## 9. Reproducibility
 
 All core, security, and bus regression targets listed in Section 2 are deterministically reproducible from git commit HEAD using the automated test harness:
 

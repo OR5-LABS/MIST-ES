@@ -2,7 +2,7 @@
 # ============================================================================
 # build.sh — build & run MIST-ES under Icarus Verilog.
 #
-#   ./build.sh [sim|cosim|rvfi|debug|pmp|epmp|upriv|mml|ecc|axil|fpga|clean]
+#   ./build.sh [sim|cosim|rvfi|debug|pmp|epmp|upriv|mml|ecc|axil|arch|arch-sim|fpga|clean]
 #
 #   sim    (default) compile the core + SoC and run the self-checking smoke test
 #   cosim  run smoke, then co-simulate against the golden RV32IM ISA model
@@ -14,6 +14,7 @@
 #   mml    SECURE: Smepmp mseccfg.MML (machine mode lockdown) rules
 #   ecc    build the register-file SECDED ECC unit test
 #   axil   build the AXI4-Lite master/slave interconnect self-check
+#   arch   build the signature simulator and run the riscv-arch-test suites
 #   fpga   build the FPGA SoC sim (UART banner + LED blink) from firmware.mem
 #   clean  remove build artifacts
 # ============================================================================
@@ -40,6 +41,22 @@ if [[ "$ACTION" == "clean" ]]; then
   exit 0
 fi
 mkdir -p sim programs/build
+
+# ---- RISC-V architecture tests (riscv-arch-test 2.7.4) ---------------------
+#   arch-sim  build the signature-dumping simulator (sim/tb_mist_es_arch)
+#   arch      build it, then run arch-test/run_arch_test.py (pass runner args
+#             after the action, e.g. ./build.sh arch --suite M)
+if [[ "$ACTION" == "arch-sim" || "$ACTION" == "arch" ]]; then
+  echo "Building the architecture-test simulator..."
+  verilator --binary --timing -j 2 -Wno-fatal -Wno-WIDTHEXPAND -Wno-WIDTHTRUNC \
+    --timescale 1ns/1ps --Mdir sim/arch_obj -o ../tb_mist_es_arch -I"$C" -I"$R" \
+    $CELLS $CORE tb/tb_mist_es_arch.sv
+  if [[ "$ACTION" == "arch" ]]; then
+    shift
+    exec "$PYTHON" arch-test/run_arch_test.py "$@"
+  fi
+  exit 0
+fi
 
 # Most testbenches end with $finish whatever the outcome, so vvp exits 0 even
 # on failure. check_verdict fails the script unless the log holds the expected

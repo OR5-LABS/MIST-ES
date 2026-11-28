@@ -267,7 +267,8 @@ module mist_es_core
                         acc_store_fault  ? 4'd7 : CAUSE_ILLEGAL;          // store access
   wire [XLEN-1:0] ex_tval = acc_fetch_fault               ? pc :
                             (acc_load_fault|acc_store_fault) ? alu_y :
-                            illegal_any                     ? instr : 32'b0;
+                            illegal_any                     ? instr :
+                            (d_is_ebreak & ~d_is_ecall)     ? pc : 32'b0;  // breakpoint: mtval = EBREAK address
   logic [XLEN-1:0] mtvec_w, mepc_w;
   logic [XLEN-1:0] seq_next;          // next PC ignoring interrupts (set below)
   wire             irq_req;

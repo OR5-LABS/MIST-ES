@@ -66,3 +66,9 @@ sw/firmware.mem
 
 # test runner outputs (tests/run_tests.sh)
 /build/
+
+# riscv-arch-test: fetched/linked suite and build output (runner and target/ stay tracked)
+arch-test/build/
+arch-test/riscv-arch-test
+arch-test/riscv-test-suite
+arch-test/riscv-test-env
