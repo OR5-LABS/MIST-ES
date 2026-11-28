@@ -16,10 +16,10 @@
 | :--- | :--- | :--- | :--- | :---: |
 | **Microarchitecture** | Exact instruction decode and execution without illegal traps on valid instructions; trap `mcause=2` on unsupported opcodes. | Icarus Verilog RTL simulation + Python golden co-sim | Deterministic multi-cycle FSM retirement across all states; zero structural deadlocks. | **PASS** |
 | **Instruction Latency** | Cycle latency must equal specified multi-cycle FSM budget under 0-wait memory. | Cycle-accurate RTL trace inspection | ALU/Branch/Store=2 cyc, Load=3 cyc, Mul/Div=34 cyc (exact FSM determinism). | **PASS** |
-| **Architectural Compliance** | 100% compliance against ratified RISC-V specifications. | Official upstream `riscv-tests` and `riscv-arch-test` suites | Pass 100% of executed test signatures; exact architectural register state match against golden models. | **PASS** |
+| **Architectural Compliance** | Compliance with the ratified RISC-V specifications. | Official upstream `riscv-tests` and `riscv-arch-test` suites | All executed test signatures pass; exact architectural register state match against golden models. | **PASS** |
 | **Formal Trace Invariants** | Step-by-step verification of architectural register and PC updates upon retirement. | Native RISC-V Formal Interface (RVFI) monitor | Continuous assertion of zero architectural divergence or hidden state bugs. | **PASS** |
 | **In-System Run-Control** | Halt, single-step, resume, and inspect registers/memory via JTAG debugger without bus freeze. | RISC-V Debug Module (0.13) DTM/DM testbench | All JTAG DTM + DM halt, register/CSR, bus access, resume, and single-step checks pass. | **PASS** |
-| **Fault Injection & Safety** | Engineered faults and negative controls must be detected and trapped reliably without silent data corruption. | Directed fault injection & PMP/ECC testbenches | 100% defect capture rate; SECDED ECC correction/detection and precise exception traps (`mcause=1, 2, 5, or 7`). | **PASS** |
+| **Fault Injection & Safety** | Engineered faults and negative controls must be detected and trapped reliably without silent data corruption. | Directed fault injection & PMP/ECC testbenches | All injected faults detected; SECDED ECC correction/detection and precise exception traps (`mcause=1, 2, 5, or 7`). | **PASS** |
 | **FPGA Implementation** | Logic utilization and timing closure within platform resource budget on Xilinx Artix-7 100T. | Vivado 2023.2 synthesis & implementation | Clean timing closure at 50 MHz; LUT, DSP, and BRAM allocation conforms to budget. | **PASS** |
 
 ---
@@ -89,9 +89,9 @@ Tests skipped by the test harness represent documented microarchitectural design
 
 ## 4. Benchmark Characterization & Measured Performance Values
 
-All performance numbers reported below represent **100% authentic, measured execution values** extracted directly from cycle-accurate RTL simulation runs. In accordance with rigorous verification standards, workloads not implemented in the repository repertoire are explicitly marked as *Not in bare-metal test repertoire* (zero synthetic numbers):
+All performance numbers reported below represent **measured execution values** extracted directly from cycle-accurate RTL simulation runs. Workloads not implemented in the repository repertoire are explicitly marked as *Not in bare-metal test repertoire*:
 
-### 1. Authentically Measured Industry Benchmarks
+### 1. Measured Industry Benchmarks
 
 | Benchmark Workload | Parameters / Run Count | Total Cycles | Retired Instructions | Workload CPI | Measured Score | Status |
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: |
@@ -179,4 +179,4 @@ All core, security, and bus regression targets listed in Section 2 are determini
 ```bash
 ./tests/run_tests.sh
 ```
-The verification suite strictly enforces **zero synthetic shortcuts, zero skipped failing tests, and 100% authentic measured data**.
+Every figure above is produced by the regression scripts in this repository; failing or skipped tests are reported as such.

@@ -1,3 +1,4 @@
++incdir+../../rtl/common
 # MIST-ES-on-Arty-A7-100T source list (Vivado read_verilog -sv / iverilog).
 # Order: shared leaf cells, core, debug module, UART, FPGA SoC, reset sync, top.
 # -I include dir: ../../rtl/common  (mist_es_pkg.sv)
