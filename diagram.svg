@@ -2,6 +2,7 @@
 <defs>
 <marker id="r" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#d62828"/></marker>
 <marker id="k" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#444"/></marker>
+<marker id="o" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#d35400"/></marker>
 </defs>
 <rect width="960" height="430" fill="#fff"/>
 <text transform="translate(30 215) rotate(-90)" text-anchor="middle" font-size="24" font-weight="bold" fill="#111">MIST-ES</text>
@@ -11,16 +12,16 @@
 <path d="M500 70 V44 H100 V150" fill="none" stroke="#d62828" stroke-width="2.5" marker-end="url(#r)"/>
 <text x="300" y="38" text-anchor="middle" fill="#d62828" font-weight="bold">LOAD done → next instruction</text>
 <path d="M300 150 C285 90 150 90 125 150" fill="none" stroke="#d62828" stroke-width="2.5" marker-end="url(#r)"/>
-<text x="212" y="82" text-anchor="middle" fill="#d62828" font-weight="bold">ALU / branch / CSR / trap</text>
+<text x="222" y="82" text-anchor="middle" font-size="11" fill="#d62828" font-weight="bold">ALU / branch / jump / store / CSR / trap</text>
 <path d="M500 294 V405 H165 V212" fill="none" stroke="#d62828" stroke-width="2.5" marker-end="url(#r)"/>
 <text x="330" y="421" text-anchor="middle" fill="#d62828" font-weight="bold">MD done → next instruction</text>
 
 <!-- forward transitions -->
 <line x1="182" y1="180" x2="248" y2="180" stroke="#111" stroke-width="2.5" marker-end="url(#k)"/>
 <line x1="352" y1="162" x2="446" y2="115" stroke="#111" stroke-width="2.5" marker-end="url(#k)"/>
-<text x="418" y="118" text-anchor="end" font-weight="bold" fill="#111" transform="rotate(-18 418 118)">load / store</text>
+<text x="394" y="130" text-anchor="end" font-size="13" font-weight="bold" fill="#111">load</text>
 <line x1="337" y1="208" x2="446" y2="245" stroke="#111" stroke-width="2.5" marker-end="url(#k)"/>
-<text x="372" y="244" text-anchor="start" font-weight="bold" fill="#111" transform="rotate(18 372 244)">mul / div</text>
+<text x="386" y="246" text-anchor="end" font-size="13" font-weight="bold" fill="#111">mul / div</text>
 
 <!-- states -->
 <rect x="78" y="150" width="104" height="60" rx="8" fill="#dff0d8" stroke="#4a9d3f" stroke-width="2.5"/>
@@ -33,21 +34,28 @@
 <text x="500" y="269" text-anchor="middle" font-size="18" font-weight="bold">MD</text>
 
 <!-- attached units -->
-<rect x="660" y="72" width="250" height="56" rx="4" fill="#fff" stroke="#444" stroke-width="1.5" stroke-dasharray="5 3"/>
-<text x="785" y="105" text-anchor="middle" font-weight="bold">DRAM / CLINT / UART</text>
-<line x1="552" y1="100" x2="658" y2="100" stroke="#444" marker-start="url(#k)" marker-end="url(#k)"/>
+<rect x="660" y="70" width="250" height="56" rx="4" fill="#fff" stroke="#444" stroke-width="1.5" stroke-dasharray="5 3"/>
+<text x="785" y="103" text-anchor="middle" font-weight="bold">DRAM / CLINT / MMIO</text>
+<line x1="554" y1="92" x2="658" y2="92" stroke="#444" stroke-width="1.5" marker-start="url(#k)" marker-end="url(#k)"/>
+<path d="M352 168 H590 V112 H658" fill="none" stroke="#444" stroke-width="1.5" marker-end="url(#k)"/>
+<text x="500" y="162" text-anchor="middle" font-size="12" font-weight="bold" fill="#444">store</text>
+
 <rect x="715" y="236" width="140" height="56" rx="4" fill="#5cc15a" stroke="#2f7d2c" stroke-width="1.5"/>
 <text x="785" y="269" text-anchor="middle" font-weight="bold">Mul/Div unit</text>
-<line x1="552" y1="264" x2="713" y2="264" stroke="#444" stroke-dasharray="4 3" marker-end="url(#k)"/>
+<line x1="554" y1="264" x2="713" y2="264" stroke="#444" stroke-width="1.5" stroke-dasharray="4 3" marker-start="url(#k)" marker-end="url(#k)"/>
 
 <rect x="30" y="300" width="125" height="46" rx="4" fill="#fff" stroke="#444" stroke-width="1.5" stroke-dasharray="5 3"/>
 <text x="92" y="328" text-anchor="middle" font-weight="bold">IMEM</text>
-<line x1="100" y1="212" x2="100" y2="298" stroke="#444" marker-start="url(#k)" marker-end="url(#k)"/>
+<line x1="100" y1="212" x2="100" y2="298" stroke="#444" stroke-width="1.5" marker-start="url(#k)" marker-end="url(#k)"/>
 <rect x="220" y="300" width="160" height="46" rx="4" fill="#d98cf5" stroke="#8e44ad" stroke-width="1.5"/>
 <text x="300" y="328" text-anchor="middle" font-weight="bold">GPR · CSR · PMP</text>
-<line x1="300" y1="210" x2="300" y2="298" stroke="#444" marker-start="url(#k)" marker-end="url(#k)"/>
+<line x1="300" y1="212" x2="300" y2="298" stroke="#444" stroke-width="1.5" marker-start="url(#k)" marker-end="url(#k)"/>
 
-<rect x="660" y="148" width="250" height="44" rx="4" fill="#eee" stroke="#444" stroke-width="1.5"/>
-<text x="785" y="175" text-anchor="middle" font-weight="bold">JTAG debug (halt / step)</text>
+<rect x="660" y="158" width="250" height="44" rx="4" fill="#eee" stroke="#d35400" stroke-width="1.5"/>
+<text x="785" y="185" text-anchor="middle" font-weight="bold" fill="#111">JTAG debug (halt / step)</text>
+<line x1="658" y1="188" x2="354" y2="188" stroke="#d35400" stroke-width="1.5" stroke-dasharray="4 3" marker-start="url(#o)" marker-end="url(#o)"/>
+<text x="505" y="205" text-anchor="middle" font-size="11.5" font-weight="bold" fill="#d35400">halt / step / reg</text>
+<line x1="785" y1="156" x2="785" y2="128" stroke="#d35400" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#o)"/>
+<text x="794" y="146" text-anchor="start" font-size="11" font-weight="bold" fill="#d35400">SBA</text>
 </g>
 </svg>
